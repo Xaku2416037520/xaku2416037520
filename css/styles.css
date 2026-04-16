@@ -681,6 +681,24 @@
             max-width: none;
         }
 
+        /* ---- DC 布局头部：左箭头 + 右侧内容 ---- */
+        body:has(#dc-layout) .header-left {
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
+        body:has(#dc-layout) .header-spacer {
+            flex: 1;
+        }
+
+        body:has(#dc-layout) .header-right {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
         .avatar {
             width: 100%;
             height: 100%;
