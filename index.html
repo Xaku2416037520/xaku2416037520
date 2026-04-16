@@ -178,6 +178,34 @@
     <button id="immersive-exit-btn" onclick="toggleImmersiveMode(false)" title="退出沉浸模式">
 <i class="fas fa-expand"></i>
 </button>
+    <!-- ===== Discord风格左侧布局 ===== -->
+    <div id="dc-layout">
+
+        <!-- 最左侧：头像图标列 -->
+        <div id="dc-icon-rail">
+            <div id="dc-icon-rail-inner">
+                <!-- 动态生成的会话头像图标 -->
+            </div>
+            <div id="dc-icon-rail-add" title="新建会话">
+                <i class="fas fa-plus"></i>
+            </div>
+        </div>
+
+        <!-- 会话列表面板 -->
+        <div id="dc-sidebar">
+            <div id="dc-sidebar-header">
+                <span id="dc-sidebar-title">会 话</span>
+                <button id="dc-sidebar-new-btn" title="新建会话"><i class="fas fa-edit"></i></button>
+            </div>
+            <div id="dc-session-list">
+                <!-- 动态生成的会话条目 -->
+            </div>
+        </div>
+
+        <!-- 主聊天区域包装 -->
+        <div id="dc-main">
+
+    <!-- 顶栏：仅在主聊天区域内显示 -->
     <div class="header">
         <div class="header-motto"></div>
         <div class="header-inner">
@@ -225,33 +253,6 @@
             </div>
         </div>
     </div>
-
-    <!-- ===== Discord风格左侧布局 ===== -->
-    <div id="dc-layout">
-
-        <!-- 最左侧：头像图标列 -->
-        <div id="dc-icon-rail">
-            <div id="dc-icon-rail-inner">
-                <!-- 动态生成的会话头像图标 -->
-            </div>
-            <div id="dc-icon-rail-add" title="新建会话">
-                <i class="fas fa-plus"></i>
-            </div>
-        </div>
-
-        <!-- 会话列表面板 -->
-        <div id="dc-sidebar">
-            <div id="dc-sidebar-header">
-                <span id="dc-sidebar-title">会 话</span>
-                <button id="dc-sidebar-new-btn" title="新建会话"><i class="fas fa-edit"></i></button>
-            </div>
-            <div id="dc-session-list">
-                <!-- 动态生成的会话条目 -->
-            </div>
-        </div>
-
-        <!-- 主聊天区域包装 -->
-        <div id="dc-main">
 
     <div class="main-chat-area">
 
