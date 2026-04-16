@@ -688,7 +688,7 @@
             padding: 4px 16px 4px;
         }
 
-        /* ---- DC 布局头部：左箭头 + 中间占位 + 右侧内容 ---- */
+        /* ---- DC 布局头部：左箭头隐藏（桌面），右侧三模块平均分布 ---- */
         body:has(#dc-layout) .header-left {
             display: flex;
             align-items: center;
@@ -696,14 +696,15 @@
         }
 
         body:has(#dc-layout) .header-spacer {
-            flex: 1;
+            display: none;
         }
 
         body:has(#dc-layout) .header-right {
+            flex: 1;
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
+            justify-content: space-evenly;
+            gap: 0;
         }
 
         .avatar {
@@ -11358,18 +11359,111 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 8px 0 8px;
-            gap: 6px;
+            padding: 0 0 8px;
+            gap: 0;
             overflow: hidden;
         }
 
-        html[data-theme="dark"] #dc-icon-rail {
-            background: linear-gradient(180deg,
-                rgba(var(--accent-color-rgb), 0.13) 0%,
-                rgba(0,0,0,0.25) 100%
-            );
+        /* 轨道顶部标题区（原侧栏 dc-sidebar-header 迁移至此） */
+        #dc-rail-header {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 8px 10px;
+            flex-shrink: 0;
+            box-sizing: border-box;
         }
 
+        #dc-sidebar-title {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            flex: 1;
+            text-align: center;
+        }
+
+        #dc-sidebar-new-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: background 0.2s, color 0.2s;
+            flex-shrink: 0;
+        }
+
+        #dc-sidebar-new-btn:hover {
+            background: rgba(var(--accent-color-rgb), 0.12);
+            color: var(--accent-color);
+        }
+
+        /* 轨道内分割线 */
+        .dc-rail-divider {
+            width: 70%;
+            height: 1px;
+            background: var(--border-color);
+            margin: 2px auto;
+            flex-shrink: 0;
+            opacity: 0.7;
+        }
+
+        /* 会话管理按钮（轨道内） */
+        #dc-rail-session-mgr {
+            width: 38px;
+            height: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            cursor: pointer;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin: 4px 0;
+            transition: background 0.2s, color 0.2s, border-radius 0.2s, transform 0.2s;
+            flex-shrink: 0;
+        }
+
+        #dc-rail-session-mgr span {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            line-height: 1;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        #dc-rail-session-mgr:hover {
+            background: rgba(var(--accent-color-rgb), 0.12);
+            color: var(--accent-color);
+            transform: scale(1.06);
+        }
+
+        #dc-rail-session-mgr:hover span {
+            color: var(--accent-color);
+        }
+
+        #dc-rail-session-mgr.active {
+            background: rgba(var(--accent-color-rgb), 0.18);
+            color: var(--accent-color);
+            border-radius: 35%;
+        }
+
+        #dc-rail-session-mgr.active span {
+            color: var(--accent-color);
+        }
+
+        /* 轨道内 inner 上方间距 */
         #dc-icon-rail-inner {
             flex: 1;
             overflow-y: auto;
@@ -11378,8 +11472,15 @@
             flex-direction: column;
             align-items: center;
             gap: 6px;
-            padding: 2px 0;
+            padding: 6px 0 2px;
             width: 100%;
+        }
+
+        html[data-theme="dark"] #dc-icon-rail {
+            background: linear-gradient(180deg,
+                rgba(var(--accent-color-rgb), 0.13) 0%,
+                rgba(0,0,0,0.25) 100%
+            );
         }
 
         /* 轨道里每个圆形会话图标 */
@@ -11458,45 +11559,16 @@
             background: var(--secondary-bg);
             border-right: 1px solid var(--border-color);
             overflow: hidden;
-            transition: background-color 0.5s ease;
+            transition: background-color 0.5s ease, width 0.25s ease;
         }
 
-        #dc-sidebar-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px 14px 10px;
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
+        /* 侧边栏折叠状态（由会话管理按钮切换） */
+        #dc-sidebar.dc-sidebar-collapsed {
+            width: 0 !important;
+            border-right-width: 0;
         }
 
-        #dc-sidebar-title {
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            color: var(--text-secondary);
-            text-transform: uppercase;
-        }
-
-        #dc-sidebar-new-btn {
-            width: 26px;
-            height: 26px;
-            border-radius: 8px;
-            border: none;
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 13px;
-            transition: background 0.2s, color 0.2s;
-        }
-
-        #dc-sidebar-new-btn:hover {
-            background: rgba(var(--accent-color-rgb), 0.12);
-            color: var(--accent-color);
-        }
+        /* #dc-sidebar-header 已迁移至 #dc-icon-rail，样式现在在轨道头部区域定义 */
 
         #dc-session-list {
             flex: 1;
@@ -11746,6 +11818,11 @@
         }
 
         #dc-popup-rename i {
+            color: var(--accent-color);
+            font-size: 12px;
+        }
+
+        #dc-popup-switch i {
             color: var(--accent-color);
             font-size: 12px;
         }

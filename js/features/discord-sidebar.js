@@ -254,6 +254,12 @@
         nameEl.textContent = partnerName || session.name;
         metaEl.textContent = '创建于 ' + new Date(session.createdAt).toLocaleDateString('zh-CN');
 
+        // 当前会话时隐藏"切换到此会话"按钮
+        const switchBtn = document.getElementById('dc-popup-switch');
+        if (switchBtn) {
+            switchBtn.style.display = (session.id === SESSION_ID) ? 'none' : '';
+        }
+
         popup.classList.remove('dc-avatar-popup-hidden');
     }
 
@@ -350,13 +356,37 @@
         const railAdd = document.getElementById('dc-icon-rail-add');
         if (railAdd) railAdd.addEventListener('click', _dcCreateNewSession);
 
-        // 侧栏标题区 — 新建按钮
+        // 侧栏标题区 — 新建按钮（已迁移至轨道，ID 不变，继续绑定）
         const sidebarNew = document.getElementById('dc-sidebar-new-btn');
         if (sidebarNew) sidebarNew.addEventListener('click', _dcCreateNewSession);
+
+        // 轨道内会话管理按钮：切换侧边栏显示/隐藏
+        const sessionMgr = document.getElementById('dc-rail-session-mgr');
+        if (sessionMgr) {
+            sessionMgr.addEventListener('click', () => {
+                const sidebar = document.getElementById('dc-sidebar');
+                if (!sidebar) return;
+                const isHidden = sidebar.classList.contains('dc-sidebar-collapsed');
+                if (isHidden) {
+                    sidebar.classList.remove('dc-sidebar-collapsed');
+                    sessionMgr.classList.add('active');
+                } else {
+                    sidebar.classList.add('dc-sidebar-collapsed');
+                    sessionMgr.classList.remove('active');
+                }
+            });
+        }
 
         // 头像弹窗关闭
         const popupClose = document.getElementById('dc-avatar-popup-close');
         if (popupClose) popupClose.addEventListener('click', _hideAvatarPopup);
+
+        // 头像弹窗：切换会话按钮
+        const popupSwitch = document.getElementById('dc-popup-switch');
+        if (popupSwitch) popupSwitch.addEventListener('click', () => {
+            _hideAvatarPopup();
+            if (_popupSessionId) _switchSession(_popupSessionId);
+        });
 
         // 头像弹窗：重命名按钮
         const popupRename = document.getElementById('dc-popup-rename');

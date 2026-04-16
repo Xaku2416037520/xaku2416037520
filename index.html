@@ -183,6 +183,20 @@
 
         <!-- 最左侧：头像图标列 -->
         <div id="dc-icon-rail">
+            <!-- 迁移自侧栏：会话标题 + 新建按钮 -->
+            <div id="dc-rail-header">
+                <span id="dc-sidebar-title">会 话</span>
+                <button id="dc-sidebar-new-btn" title="新建会话"><i class="fas fa-edit"></i></button>
+            </div>
+            <!-- 分割线 -->
+            <div class="dc-rail-divider"></div>
+            <!-- 会话管理按钮 -->
+            <div id="dc-rail-session-mgr" title="会话管理">
+                <i class="fas fa-comments"></i>
+                <span>会话</span>
+            </div>
+            <!-- 分割线 -->
+            <div class="dc-rail-divider"></div>
             <div id="dc-icon-rail-inner">
                 <!-- 动态生成的会话头像图标 -->
             </div>
@@ -193,10 +207,6 @@
 
         <!-- 会话列表面板 -->
         <div id="dc-sidebar">
-            <div id="dc-sidebar-header">
-                <span id="dc-sidebar-title">会 话</span>
-                <button id="dc-sidebar-new-btn" title="新建会话"><i class="fas fa-edit"></i></button>
-            </div>
             <div id="dc-session-list">
                 <!-- 动态生成的会话条目 -->
             </div>
@@ -414,6 +424,7 @@
             <div id="dc-avatar-popup-name"></div>
             <div id="dc-avatar-popup-meta"></div>
             <div id="dc-avatar-popup-actions">
+                <button id="dc-popup-switch"><i class="fas fa-exchange-alt"></i> 切换到此会话</button>
                 <button id="dc-popup-rename"><i class="fas fa-pen"></i> 重命名</button>
                 <button id="dc-popup-delete"><i class="fas fa-trash"></i> 删除会话</button>
             </div>
