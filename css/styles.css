@@ -8788,6 +8788,10 @@
         .chat-container > .chat-spacer + .message-wrapper {
             margin-top: 0 !important;
         }
+        /* 拍一拍/系统消息后的第一条消息不加组间距，避免上下空白过宽 */
+        .system-message + .message-wrapper.discord-msg-first {
+            margin-top: 0 !important;
+        }
 
         /* 移动端 */
         @media (max-width: 480px) {
@@ -8950,6 +8954,8 @@
             /* row1 = 引用栏（auto），row2 = 头像+内容（auto） */
             grid-template-rows: auto auto;
             align-items: start;
+            /* 消除 flex gap 在 grid 模式下变成 column-gap 导致内容列额外右偏 10px 的问题 */
+            gap: 0 !important;
         }
 
         /* 对方（received）：col1=头像，col2=内容，靠左 */
@@ -8978,6 +8984,8 @@
             grid-column: 2;
             grid-row: 2;
             align-self: flex-start;
+            /* 右对齐头像使其贴右边，与普通消息头像位置一致，引用线公式（right: avatar/2-1px）也因此正确 */
+            justify-self: end;
         }
         .message-wrapper.sent.has-reply > .message-content-wrapper {
             grid-column: 1;
