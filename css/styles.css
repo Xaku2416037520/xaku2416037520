@@ -11694,10 +11694,10 @@
         /* ---- 头像弹窗 ---- */
         #dc-avatar-popup {
             position: fixed;
-            z-index: 9500;
+            z-index: 8000;
             top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(1);
+            left: calc(var(--dc-rail-width) + 10px);
+            transform: translateY(-50%) scale(1);
             width: 220px;
             background: var(--secondary-bg);
             border-radius: 18px;
@@ -11723,8 +11723,8 @@
         }
 
         @keyframes dcPopupIn {
-            from { opacity: 0; transform: translate(-50%, -50%) scale(0.88); }
-            to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            from { opacity: 0; transform: translateY(-50%) scale(0.88); }
+            to   { opacity: 1; transform: translateY(-50%) scale(1); }
         }
 
         .dc-avatar-popup-hidden {
@@ -11856,50 +11856,7 @@
             to   { opacity: 1; }
         }
 
-        /* ---- 宽屏：侧栏始终显示（inline flex） ---- */
-        #dc-icon-rail,
-        #dc-sidebar {
-            display: flex;
-        }
-
-        /* 侧栏打开状态（覆盖层，仅窄屏使用） */
-        #dc-icon-rail.dc-mobile-open,
-        #dc-sidebar.dc-mobile-open {
-            display: flex !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            height: 100dvh !important;
-            z-index: 9000 !important;
-            animation: dcSlideInLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-
-        /* 侧栏关闭动效 */
-        #dc-icon-rail.dc-mobile-closing,
-        #dc-sidebar.dc-mobile-closing {
-            display: flex !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            height: 100dvh !important;
-            z-index: 9000 !important;
-            animation: dcSlideOutLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both !important;
-        }
-
-        /* 遮罩层 */
-        #dc-mobile-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0,0,0,0.45);
-            z-index: 8999;
-            animation: dcFadeIn 0.22s ease both;
-        }
-        #dc-mobile-overlay.dc-mobile-overlay-show {
-            display: block;
-        }
-
-        /* 窄屏（≤768px）：侧栏隐藏，按钮触发覆盖层抽屉 */
+        /* ---- 响应式：小屏幕（≤768px）隐藏侧栏，显示导航箭头 ---- */
         @media (max-width: 768px) {
             #dc-icon-rail,
             #dc-sidebar {
@@ -11908,20 +11865,41 @@
             .input-area-wrapper {
                 left: 0 !important;
             }
-            #dc-sidebar.dc-mobile-open,
-            #dc-sidebar.dc-mobile-closing {
-                width: calc(100vw - var(--dc-rail-width)) !important;
+
+            /* 移动端侧栏滑入状态 */
+            #dc-icon-rail.dc-mobile-open,
+            #dc-sidebar.dc-mobile-open {
+                display: flex !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100dvh !important;
+                z-index: 9000 !important;
+                animation: dcSlideInLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+            }
+
+            /* 遮罩层 */
+            #dc-mobile-overlay {
+                display: none;
+                position: fixed;
+                inset: 0;
+                background: rgba(0,0,0,0.45);
+                z-index: 8999;
+                animation: dcFadeIn 0.22s ease both;
+            }
+            #dc-mobile-overlay.dc-mobile-overlay-show {
+                display: block;
+            }
+
+            /* 左箭头按钮 */
+            #dc-mobile-open-btn {
+                display: flex !important;
             }
         }
 
-        @keyframes dcSlideOutLeft {
-            from { transform: translateX(0);     opacity: 1; }
-            to   { transform: translateX(-100%); opacity: 0; }
-        }
-
-        /* 打开会话列表按钮（所有屏幕尺寸显示） */
+        /* 非移动端隐藏左箭头 */
         #dc-mobile-open-btn {
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             width: 36px;
