@@ -3055,8 +3055,22 @@
 
         #advanced-modal .settings-item-list {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+        }
+        /* 2-3-2 布局：第1行2个（各占3格），第2行3个（各占2格），第3行2个（各占3格） */
+        #advanced-modal .settings-item-list .settings-item:nth-child(1),
+        #advanced-modal .settings-item-list .settings-item:nth-child(2) {
+            grid-column: span 3;
+        }
+        #advanced-modal .settings-item-list .settings-item:nth-child(3),
+        #advanced-modal .settings-item-list .settings-item:nth-child(4),
+        #advanced-modal .settings-item-list .settings-item:nth-child(5) {
+            grid-column: span 2;
+        }
+        #advanced-modal .settings-item-list .settings-item:nth-child(6),
+        #advanced-modal .settings-item-list .settings-item:nth-child(7) {
+            grid-column: span 3;
         }
 
         #advanced-modal .settings-item {
@@ -12005,24 +12019,41 @@ body.bottom-collapse-mode .header-actions #call-toolbar-btn {
     width: 33.33%;
     min-width: 120px;
     border-radius: 999px;
-    overflow: hidden;
     border: 1.5px solid var(--border-color);
     background: var(--primary-bg);
+    position: relative;
+    padding: 3px;
+}
+.focus-mode-slider-bg {
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: calc(50% - 3px);
+    border-radius: 999px;
+    background: var(--accent-color);
+    transition: transform 0.42s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    z-index: 0;
+}
+.focus-mode-slider-bg.slider-at-right {
+    transform: translateX(100%);
 }
 .focus-mode-opt {
+    position: relative;
+    z-index: 1;
     flex: 1;
     text-align: center;
     padding: 8px 4px;
     cursor: pointer;
     font-size: 13px;
     letter-spacing: 0.5px;
-    transition: background 0.28s cubic-bezier(0.25, 0.8, 0.25, 1), color 0.28s;
+    transition: color 0.3s ease, font-weight 0.2s ease;
     color: var(--text-secondary);
     user-select: none;
     border-radius: 999px;
 }
 .focus-mode-opt-active {
-    background: var(--accent-color);
     color: #fff;
     font-weight: 600;
 }

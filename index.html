@@ -237,6 +237,7 @@
                     <button id="session-manager-btn" class="action-btn" title="会话管理" style="display:none;"><i class="fas fa-comments"></i></button>
                     <button id="daily-greeting-btn" class="action-btn" title="今日公告" onclick="reopenDailyGreeting()"><i class="fas fa-newspaper"></i></button>
                     <button id="call-toolbar-btn" class="action-btn" title="视频通话" onclick="if(window.callFeature&&typeof window.callFeature.startCall==='function')window.callFeature.startCall(false);"><i class="fas fa-video"></i></button>
+                    <button id="custom-replies-header-btn" class="action-btn" title="自定义回复" onclick="window.openCustomRepliesModal&&window.openCustomRepliesModal()"><i class="fas fa-comment-dots"></i></button>
                     <button id="settings-btn" class="action-btn" title="设置"><i class="fas fa-cog"></i></button>
                 </div>
                 <div class="user-info">
@@ -370,6 +371,7 @@
         </div>
         <div class="input-area">
     <button id="collapse-expand-btn" title="展开更多" style="display:none;width:36px;height:36px;border:none;border-radius:50%;cursor:pointer;background:rgba(var(--accent-color-rgb),0.12);color:var(--accent-color);font-size:14px;transition:all 0.25s;flex-shrink:0;align-items:center;justify-content:center;" onclick="window.toggleCollapsedExtras && window.toggleCollapsedExtras()"><i class="fas fa-chevron-up"></i></button>
+    <button class="attachment-btn input-btn collapse-hideable" id="advanced-functions-btn" title="互动" onclick="showModal(document.getElementById('advanced-modal'))"><i class="fas fa-gift"></i></button>
     <button class="attachment-btn input-btn collapse-hideable" id="attachment-btn" title="发送图片"><i class="fas fa-image"></i></button>
     
     <button class="combo-btn input-btn collapse-hideable" id="combo-btn" title="表情 & 拍一拍">
@@ -688,7 +690,7 @@
                     <i class="fas fa-comments"></i>
                     <span>聊天设置</span>
                 </div>
-                <div class="settings-card" id="advanced-settings">
+                <div class="settings-card" id="advanced-settings" style="display:none;">
                     <i class="fas fa-tools"></i>
                     <span>高级功能</span>
                 </div>
@@ -1467,8 +1469,9 @@
                     <!-- 唯一/并蓄 焦点模式切换 -->
                     <div style="display:flex;flex-direction:column;align-items:center;margin-top:16px;padding-bottom:4px;">
                         <div class="focus-mode-selector" id="focus-mode-selector">
+                            <div class="focus-mode-slider-bg slider-at-right" id="focus-mode-slider-bg"></div>
                             <div class="focus-mode-opt" id="focus-mode-unique" onclick="window.setFocusMode('unique')">唯一</div>
-                            <div class="focus-mode-opt focus-mode-opt-active" id="focus-mode-together" onclick="window.setFocusMode('together')">并蓄</div>
+                            <div class="focus-mode-opt" id="focus-mode-together" onclick="window.setFocusMode('together')">并蓄</div>
                         </div>
                     </div>
                     <div class="focus-mode-text" id="focus-mode-text">爱如繁星，每一颗都熠熠生辉。</div>
@@ -1502,46 +1505,38 @@
 <div class="modal" id="advanced-modal">
         <div class="modal-content">
             <div class="modal-title">
-                <i class="fas fa-tools"></i><span>高级功能</span>
+                <i class="fas fa-gift"></i><span>互动</span>
             </div>
 
-            <div class="settings-section">
-                <div class="settings-section-title">
-                    <i class="fas fa-magic"></i>实用工具
+            <div class="settings-item-list" id="advanced-item-list">
+                <div class="settings-item" id="mood-function">
+                    <i class="fas fa-calendar-day"></i><span>心晴手账</span>
                 </div>
-                <div class="settings-item-list">
-                    <div class="settings-item" id="custom-replies-function">
-                        <i class="fas fa-comment-dots"></i><span>自定义回复</span>
-                    </div>
-                    <div class="settings-item" id="music-player-toggle">
-                        <i class="fas fa-music"></i><span>悬浮音乐播放器</span>
-                    </div>
-                    <div class="settings-item" id="stats-function">
-                        <i class="fas fa-chart-bar"></i><span>消息统计</span>
-                    </div>
-                    <div class="settings-item" id="decision-function">
-                        <i class="fas fa-balance-scale"></i> 
-                        <span>抉择</span> 
-                    </div>
-                    <div class="settings-item" id="fortune-lenormand-function" style="position:relative;">
-                        <i class="fas fa-star-and-crescent"></i><span>运势 · 占卜</span>
-                    </div>
-                    <div class="settings-item" id="anniversary-function">
-                        <i class="fas fa-heart"></i><span>重要日</span>
-                    </div>
-                    <div class="settings-item" id="mood-function">
-                        <i class="fas fa-calendar-day"></i><span>心晴手账</span>
-                    </div>
-                    <div class="settings-item" id="envelope-function">
-                        <i class="fas fa-envelope"></i><span>信封投递</span>
-                    </div>
+                <div class="settings-item" id="envelope-function">
+                    <i class="fas fa-envelope"></i><span>信封投递</span>
+                </div>
+                <div class="settings-item" id="decision-function">
+                    <i class="fas fa-balance-scale"></i><span>抉择</span>
+                </div>
+                <div class="settings-item" id="fortune-lenormand-function" style="position:relative;">
+                    <i class="fas fa-star-and-crescent"></i><span>运势 · 占卜</span>
+                </div>
+                <div class="settings-item" id="anniversary-function">
+                    <i class="fas fa-heart"></i><span>重要日</span>
+                </div>
+                <div class="settings-item" id="music-player-toggle">
+                    <i class="fas fa-music"></i><span>悬浮音乐播放器</span>
+                </div>
+                <div class="settings-item" id="stats-function">
+                    <i class="fas fa-chart-bar"></i><span>消息统计</span>
+                </div>
+                <!-- 保留原有custom-replies-function以兼容reply-library.js监听器，但隐藏UI -->
+                <div class="settings-item" id="custom-replies-function" style="display:none;">
+                    <i class="fas fa-comment-dots"></i><span>自定义回复</span>
                 </div>
             </div>
 
             <div class="modal-buttons" style="position:sticky;bottom:0;background:var(--secondary-bg);border-top:1px solid var(--border-color);padding:12px 0 0;z-index:10;margin-top:8px;margin-left:-24px;margin-right:-24px;padding-left:24px;padding-right:24px;padding-bottom:max(14px, env(safe-area-inset-bottom, 0px));">
-                <button class="modal-btn modal-btn-secondary" id="back-advanced" onclick="(function(){hideModal(document.getElementById('advanced-modal'));showModal(document.getElementById('settings-modal'))})()">
-                    <i class="fas fa-arrow-left"></i> 返回
-                </button>
                 <button class="modal-btn modal-btn-secondary" id="close-advanced">关闭</button>
             </div>
         </div>

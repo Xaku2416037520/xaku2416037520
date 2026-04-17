@@ -3,6 +3,10 @@
     var PTR_SYM_KEY  = 'pokeSym_partner';
     var MY_CUST_KEY  = 'pokeSym_my_custom';
     var PTR_CUST_KEY = 'pokeSym_partner_custom';
+    var MY_CUST_L    = 'pokeSym_my_cust_left';
+    var MY_CUST_R    = 'pokeSym_my_cust_right';
+    var PTR_CUST_L   = 'pokeSym_ptr_cust_left';
+    var PTR_CUST_R   = 'pokeSym_ptr_cust_right';
 
     var PRESETS = [
         { value: 'none',    label: '无装饰',   sym: '' },
@@ -16,35 +20,45 @@
         { value: 'custom',  label: '自定义…',  sym: null }
     ];
 
-    function _getSym(key, customKey) {
+    function _getPresetSym(key) {
         var v = localStorage.getItem(key) || 'star4';
-        if (v === 'custom') return localStorage.getItem(customKey) || '✦';
+        var p = PRESETS.find(function(x){ return x.value === v; });
+        return (p && p.sym !== null) ? p.sym : null;
+    }
+
+    function _getSym(symKey, custLKey, custRKey, custFallbackKey, side) {
+        var v = localStorage.getItem(symKey) || 'star4';
+        if (v === 'custom') {
+            var lrKey = side === 'left' ? custLKey : custRKey;
+            return localStorage.getItem(lrKey) || localStorage.getItem(custFallbackKey) || '✦';
+        }
         var p = PRESETS.find(function(x){ return x.value === v; });
         return p ? p.sym : '✦';
     }
 
-    // 用于“戳一戳”文本的清理：移除大部分表情类字符，避免用户文本里夹带 emoji
-    // 装饰符号仍由 _formatPokeText() 根据用户配置自动包裹输出
     function _stripEmojiForPoke(text) {
         return String(text || '')
-            // 常见 Emoji / 符号区段（尽量保守）
             .replace(/[\u2600-\u27BF\u{1F300}-\u{1FAFF}]/gu, '')
             .replace(/\s+/g, ' ')
             .trim();
     }
 
     window._formatPokeText = function(text) {
-        var sym = _getSym(MY_SYM_KEY, MY_CUST_KEY);
-        return sym ? (sym + ' ' + text + ' ' + sym) : text;
+        var left  = _getSym(MY_SYM_KEY, MY_CUST_L, MY_CUST_R, MY_CUST_KEY, 'left');
+        var right = _getSym(MY_SYM_KEY, MY_CUST_L, MY_CUST_R, MY_CUST_KEY, 'right');
+        if (!left && !right) return text;
+        return (left ? left + ' ' : '') + text + (right ? ' ' + right : '');
     };
     window._formatPartnerPokeText = function(text) {
-        var sym = _getSym(PTR_SYM_KEY, PTR_CUST_KEY);
-        return sym ? (sym + ' ' + text + ' ' + sym) : text;
+        var left  = _getSym(PTR_SYM_KEY, PTR_CUST_L, PTR_CUST_R, PTR_CUST_KEY, 'left');
+        var right = _getSym(PTR_SYM_KEY, PTR_CUST_L, PTR_CUST_R, PTR_CUST_KEY, 'right');
+        if (!left && !right) return text;
+        return (left ? left + ' ' : '') + text + (right ? ' ' + right : '');
     };
     window._sanitizePokeTextForDisplay = _stripEmojiForPoke;
 
     function _esc(s) {
-        return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/”/g,'&quot;');
     }
 
     window._openPokeSymSettings = function() {
@@ -53,65 +67,100 @@
 
         var mySel    = localStorage.getItem(MY_SYM_KEY) || 'star4';
         var ptrSel   = localStorage.getItem(PTR_SYM_KEY) || 'star4';
-        var myCustom = localStorage.getItem(MY_CUST_KEY) || '';
-        var ptrCustom= localStorage.getItem(PTR_CUST_KEY) || '';
+        var myL      = localStorage.getItem(MY_CUST_L) || localStorage.getItem(MY_CUST_KEY) || '';
+        var myR      = localStorage.getItem(MY_CUST_R) || localStorage.getItem(MY_CUST_KEY) || '';
+        var ptrL     = localStorage.getItem(PTR_CUST_L) || localStorage.getItem(PTR_CUST_KEY) || '';
+        var ptrR     = localStorage.getItem(PTR_CUST_R) || localStorage.getItem(PTR_CUST_KEY) || '';
 
         function opts(sel) {
             return PRESETS.map(function(p){
-                return '<option value="'+p.value+'"'+(sel===p.value?' selected':'')+'>'+p.label+'</option>';
+                return '<option value=”'+p.value+'”'+(sel===p.value?' selected':'')+'>'+p.label+'</option>';
             }).join('');
         }
+        var myLRStyle  = mySel==='custom'?'':'display:none;';
+        var ptrLRStyle = ptrSel==='custom'?'':'display:none;';
+        var lrRowStyle = 'display:flex;gap:8px;margin-bottom:12px;';
+        var lrInStyle  = 'width:100%;padding:7px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;box-sizing:border-box;font-family:var(--font-family);';
+        var lrLabelStyle = 'font-size:11px;color:var(--text-secondary);margin-bottom:4px;font-weight:600;';
 
         var wrap = document.createElement('div');
         wrap.id = 'poke-sym-modal';
         wrap.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
         wrap.innerHTML = [
-            '<div style="background:var(--primary-bg);border-radius:20px;padding:22px 20px;width:min(340px,92vw);box-shadow:0 20px 60px rgba(0,0,0,0.28);border:1px solid var(--border-color);">',
-              '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">',
-                '<span style="font-size:15px;font-weight:700;color:var(--text-primary);font-family:var(--font-family);">戳一戳装饰符号</span>',
-                '<button id="psm-close" style="background:none;border:none;font-size:18px;color:var(--text-secondary);cursor:pointer;padding:2px 6px;border-radius:6px;">✕</button>',
+            '<div style=”background:var(--primary-bg);border-radius:20px;padding:22px 20px;width:min(360px,92vw);box-shadow:0 20px 60px rgba(0,0,0,0.28);border:1px solid var(--border-color);”>',
+              '<div style=”display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;”>',
+                '<span style=”font-size:15px;font-weight:700;color:var(--text-primary);font-family:var(--font-family);”>戳一戳装饰符号</span>',
+                '<button id=”psm-close” style=”background:none;border:none;font-size:18px;color:var(--text-secondary);cursor:pointer;padding:2px 6px;border-radius:6px;”>✕</button>',
               '</div>',
-              '<div style="font-size:11px;color:var(--text-secondary);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;">我发出的</div>',
-              '<select id="psm-my" style="width:100%;padding:9px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;font-family:var(--font-family);margin-bottom:8px;">'+opts(mySel)+'</select>',
-              '<div id="psm-my-cw" style="margin-bottom:12px;display:'+(mySel==='custom'?'block':'none')+';">',
-                '<input id="psm-my-ci" type="text" maxlength="4" placeholder="输入 1-2 个字符" value="'+_esc(myCustom)+'" style="width:100%;padding:8px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;box-sizing:border-box;font-family:var(--font-family);">',
+              '<div style=”font-size:11px;color:var(--text-secondary);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;”>我发出的</div>',
+              '<select id=”psm-my” style=”width:100%;padding:9px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;font-family:var(--font-family);margin-bottom:8px;”>'+opts(mySel)+'</select>',
+              '<div id=”psm-my-cw” style=”'+myLRStyle+'”>',
+                '<div style=”'+lrRowStyle+'”>',
+                  '<div style=”flex:1;”>',
+                    '<div style=”'+lrLabelStyle+'”>左边符号</div>',
+                    '<input id=”psm-my-l” type=”text” maxlength=”4” placeholder=”左符号” value=”'+_esc(myL)+'” style=”'+lrInStyle+'”>',
+                  '</div>',
+                  '<div style=”flex:1;”>',
+                    '<div style=”'+lrLabelStyle+'”>右边符号</div>',
+                    '<input id=”psm-my-r” type=”text” maxlength=”4” placeholder=”右符号” value=”'+_esc(myR)+'” style=”'+lrInStyle+'”>',
+                  '</div>',
+                '</div>',
               '</div>',
-              '<div style="font-size:11px;color:var(--text-secondary);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;">对方发出的</div>',
-              '<select id="psm-ptr" style="width:100%;padding:9px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;font-family:var(--font-family);margin-bottom:8px;">'+opts(ptrSel)+'</select>',
-              '<div id="psm-ptr-cw" style="margin-bottom:14px;display:'+(ptrSel==='custom'?'block':'none')+';">',
-                '<input id="psm-ptr-ci" type="text" maxlength="4" placeholder="输入 1-2 个字符" value="'+_esc(ptrCustom)+'" style="width:100%;padding:8px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;box-sizing:border-box;font-family:var(--font-family);">',
+              '<div style=”font-size:11px;color:var(--text-secondary);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;”>对方发出的</div>',
+              '<select id=”psm-ptr” style=”width:100%;padding:9px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;font-family:var(--font-family);margin-bottom:8px;”>'+opts(ptrSel)+'</select>',
+              '<div id=”psm-ptr-cw” style=”'+ptrLRStyle+'”>',
+                '<div style=”'+lrRowStyle+'”>',
+                  '<div style=”flex:1;”>',
+                    '<div style=”'+lrLabelStyle+'”>左边符号</div>',
+                    '<input id=”psm-ptr-l” type=”text” maxlength=”4” placeholder=”左符号” value=”'+_esc(ptrL)+'” style=”'+lrInStyle+'”>',
+                  '</div>',
+                  '<div style=”flex:1;”>',
+                    '<div style=”'+lrLabelStyle+'”>右边符号</div>',
+                    '<input id=”psm-ptr-r” type=”text” maxlength=”4” placeholder=”右符号” value=”'+_esc(ptrR)+'” style=”'+lrInStyle+'”>',
+                  '</div>',
+                '</div>',
               '</div>',
-              '<div id="psm-preview" style="background:var(--secondary-bg);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--text-secondary);margin-bottom:16px;border:1px dashed var(--border-color);line-height:1.7;"></div>',
-              '<div style="display:flex;gap:8px;">',
-                '<button id="psm-cancel" style="flex:1;padding:9px;border:1px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-secondary);font-size:13px;cursor:pointer;font-family:var(--font-family);">取消</button>',
-                '<button id="psm-save" style="flex:2;padding:9px;border:none;border-radius:10px;background:var(--accent-color);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-family);">保存</button>',
+              '<div id=”psm-preview” style=”background:var(--secondary-bg);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--text-secondary);margin-bottom:16px;border:1px dashed var(--border-color);line-height:1.7;”></div>',
+              '<div style=”display:flex;gap:8px;”>',
+                '<button id=”psm-cancel” style=”flex:1;padding:9px;border:1px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-secondary);font-size:13px;cursor:pointer;font-family:var(--font-family);”>取消</button>',
+                '<button id=”psm-save” style=”flex:2;padding:9px;border:none;border-radius:10px;background:var(--accent-color);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-family);”>保存</button>',
               '</div>',
             '</div>'
         ].join('');
         document.body.appendChild(wrap);
 
+        function getPreviewSym(selId, lId, rId) {
+            var v = document.getElementById(selId).value;
+            if (v === 'custom') {
+                var l = document.getElementById(lId).value || '✦';
+                var r = document.getElementById(rId).value || '✦';
+                return { left: l, right: r };
+            }
+            var ps = (PRESETS.find(function(x){return x.value===v;})||{}).sym||'';
+            return { left: ps, right: ps };
+        }
+
         function preview() {
-            var mv = document.getElementById('psm-my').value;
-            var pv = document.getElementById('psm-ptr').value;
-            var ms = mv==='custom'?(document.getElementById('psm-my-ci').value||'✦'):((PRESETS.find(function(x){return x.value===mv;})||{}).sym||'');
-            var ps = pv==='custom'?(document.getElementById('psm-ptr-ci').value||'✦'):((PRESETS.find(function(x){return x.value===pv;})||{}).sym||'');
-            var myN  = (typeof settings!=='undefined'&&settings.myName)||'我';
-            var pN   = (typeof settings!=='undefined'&&settings.partnerName)||'对方';
-            var mt   = ms?(ms+' '+myN+' 拍了拍你 '+ms):(myN+' 拍了拍你');
-            var pt   = ps?(ps+' '+pN+' 拍了拍你 '+ps):(pN+' 拍了拍你');
+            var ms = getPreviewSym('psm-my',  'psm-my-l',  'psm-my-r');
+            var ps = getPreviewSym('psm-ptr', 'psm-ptr-l', 'psm-ptr-r');
+            var myN = (typeof settings!=='undefined'&&settings.myName)||'我';
+            var pN  = (typeof settings!=='undefined'&&settings.partnerName)||'对方';
+            var mt  = (ms.left||ms.right) ? ((ms.left?ms.left+' ':'')+myN+' 拍了拍你'+(ms.right?' '+ms.right:'')) : (myN+' 拍了拍你');
+            var pt  = (ps.left||ps.right) ? ((ps.left?ps.left+' ':'')+pN+' 拍了拍你'+(ps.right?' '+ps.right:'')) : (pN+' 拍了拍你');
             document.getElementById('psm-preview').innerHTML =
-                '<div style="color:var(--text-primary);">我：'+_esc(mt)+'</div>'+
-                '<div style="color:var(--text-primary);margin-top:3px;">对方：'+_esc(pt)+'</div>';
+                '<div style=”color:var(--text-primary);”>我：'+_esc(mt)+'</div>'+
+                '<div style=”color:var(--text-primary);margin-top:3px;”>对方：'+_esc(pt)+'</div>';
         }
 
         document.getElementById('psm-my').addEventListener('change', function(){
-            document.getElementById('psm-my-cw').style.display = this.value==='custom'?'block':'none'; preview();
+            document.getElementById('psm-my-cw').style.display = this.value==='custom'?'':'none'; preview();
         });
         document.getElementById('psm-ptr').addEventListener('change', function(){
-            document.getElementById('psm-ptr-cw').style.display = this.value==='custom'?'block':'none'; preview();
+            document.getElementById('psm-ptr-cw').style.display = this.value==='custom'?'':'none'; preview();
         });
-        document.getElementById('psm-my-ci').addEventListener('input', preview);
-        document.getElementById('psm-ptr-ci').addEventListener('input', preview);
+        ['psm-my-l','psm-my-r','psm-ptr-l','psm-ptr-r'].forEach(function(id){
+            document.getElementById(id).addEventListener('input', preview);
+        });
         preview();
 
         function close(){ wrap.remove(); }
@@ -123,8 +172,14 @@
             var pv = document.getElementById('psm-ptr').value;
             localStorage.setItem(MY_SYM_KEY, mv);
             localStorage.setItem(PTR_SYM_KEY, pv);
-            if(mv==='custom') localStorage.setItem(MY_CUST_KEY, document.getElementById('psm-my-ci').value.trim());
-            if(pv==='custom') localStorage.setItem(PTR_CUST_KEY, document.getElementById('psm-ptr-ci').value.trim());
+            if (mv==='custom') {
+                localStorage.setItem(MY_CUST_L, document.getElementById('psm-my-l').value.trim());
+                localStorage.setItem(MY_CUST_R, document.getElementById('psm-my-r').value.trim());
+            }
+            if (pv==='custom') {
+                localStorage.setItem(PTR_CUST_L, document.getElementById('psm-ptr-l').value.trim());
+                localStorage.setItem(PTR_CUST_R, document.getElementById('psm-ptr-r').value.trim());
+            }
             close();
             if(window._syncPokeDesc) window._syncPokeDesc();
             if(typeof showNotification==='function') showNotification('戳一戳符号已保存 ✓','success',1800);
@@ -1613,6 +1668,14 @@ window.tryShowDailyGreeting = function() {
     } catch(e) { console.warn('Daily greeting show error:', e); }
 };
 
+/* ===== 自定义回复快捷入口 ===== */
+window.openCustomRepliesModal = function() {
+    var btn = document.getElementById('custom-replies-function');
+    if (btn) { btn.click(); return; }
+    var modal = document.getElementById('custom-replies-modal');
+    if (modal && typeof showModal === 'function') showModal(modal);
+};
+
 /* ===== 唯一/并蓄 焦点模式 ===== */
 (function() {
     var STORAGE_KEY = 'focusMode_v1';
@@ -1623,12 +1686,14 @@ window.tryShowDailyGreeting = function() {
 
         var optUnique = document.getElementById('focus-mode-unique');
         var optTogether = document.getElementById('focus-mode-together');
+        var sliderBg = document.getElementById('focus-mode-slider-bg');
         if (!optUnique || !optTogether) return;
 
         optUnique.classList.toggle('focus-mode-opt-active', isUnique);
         optTogether.classList.toggle('focus-mode-opt-active', !isUnique);
         optUnique.textContent = isUnique ? '唯一' : '◎';
         optTogether.textContent = isUnique ? '✧' : '并蓄';
+        if (sliderBg) sliderBg.classList.toggle('slider-at-right', !isUnique);
     }
 
     window.setFocusMode = function(mode) {
