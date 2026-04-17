@@ -176,6 +176,12 @@
                 avatarDiv.appendChild(span);
             }
 
+            // 点击头像显示弹窗
+            avatarDiv.addEventListener('click', (e) => {
+                e.stopPropagation();
+                _showAvatarPopup(session, avatarSrc, names.partnerName);
+            });
+
             // 文字信息
             const infoDiv = document.createElement('div');
             infoDiv.className = 'dc-session-item-info';
@@ -207,7 +213,7 @@
        渲染全部（轨道 + 列表，同时发起以节省时间）
     ─────────────────────────────────────────────── */
     async function dcRenderAll() {
-        await Promise.all([dcRenderIconRail(), dcRenderSidebar()]);
+        await dcRenderSidebar();
     }
 
     /* ───────────────────────────────────────────────
@@ -406,7 +412,7 @@
         document.addEventListener('click', (e) => {
             const popup = document.getElementById('dc-avatar-popup');
             if (popup && !popup.classList.contains('dc-avatar-popup-hidden')) {
-                if (!popup.contains(e.target) && !e.target.closest('.dc-rail-avatar')) {
+                if (!popup.contains(e.target) && !e.target.closest('.dc-session-item-avatar')) {
                     _hideAvatarPopup();
                 }
             }

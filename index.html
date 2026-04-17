@@ -186,13 +186,14 @@
             <!-- 会话管理按钮 -->
             <div id="dc-rail-session-mgr" title="会话管理">
                 <i class="fas fa-comments"></i>
-                <span>会话</span>
             </div>
             <!-- 分割线 -->
             <div class="dc-rail-divider"></div>
-            <div id="dc-icon-rail-inner">
-                <!-- 动态生成的会话头像图标 -->
-            </div>
+            <!-- 群聊按钮（迁移自顶栏） -->
+            <button id="group-chat-btn" class="dc-rail-icon-btn" title="群聊设置">
+                <i class="fas fa-users"></i>
+                <span>群聊</span>
+            </button>
         </div>
 
         <!-- 会话列表面板 -->
@@ -235,7 +236,6 @@
                 </div>
                 <div class="header-actions">
                     <button id="session-manager-btn" class="action-btn" title="会话管理"><i class="fas fa-comments"></i></button>
-                    <button id="group-chat-btn" class="action-btn" title="群聊设置"><i class="fas fa-users"></i></button>
                     <button id="daily-greeting-btn" class="action-btn" title="今日公告" onclick="reopenDailyGreeting()"><i class="fas fa-newspaper"></i></button>
                     <button id="theme-toggle" class="action-btn" title="切换主题"><i class="fas fa-moon"></i></button>
                     <button id="settings-btn" class="action-btn" title="设置"><i class="fas fa-cog"></i></button>

@@ -11421,6 +11421,44 @@
             color: var(--accent-color);
         }
 
+        /* 轨道内通用图标按钮（群聊等迁移按钮） */
+        .dc-rail-icon-btn {
+            width: 38px;
+            height: 44px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.2s, color 0.2s, transform 0.15s;
+            flex-shrink: 0;
+            font-size: 16px;
+            padding: 0;
+        }
+
+        .dc-rail-icon-btn span {
+            font-size: 9px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .dc-rail-icon-btn:hover {
+            background: rgba(var(--accent-color-rgb), 0.12);
+            color: var(--accent-color);
+            transform: scale(1.06);
+        }
+
+        .dc-rail-icon-btn:hover span {
+            color: var(--accent-color);
+        }
+
         /* 轨道内 inner 上方间距 */
         #dc-icon-rail-inner {
             flex: 1;
@@ -11573,6 +11611,13 @@
             align-items: center;
             justify-content: center;
             border: 1.5px solid rgba(var(--accent-color-rgb), 0.15);
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .dc-session-item-avatar:hover {
+            transform: scale(1.08);
+            box-shadow: 0 3px 10px rgba(var(--accent-color-rgb), 0.30);
         }
 
         .dc-session-item-avatar img {
