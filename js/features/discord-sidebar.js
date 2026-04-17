@@ -340,12 +340,15 @@
         const rail    = document.getElementById('dc-icon-rail');
         const sidebar = document.getElementById('dc-sidebar');
         const overlay = document.getElementById('dc-mobile-overlay');
-        // 清除可能残留的关闭动画 class
+        // 清除可能残留的关闭动画 class 和折叠 class
         if (rail)    { rail.classList.remove('dc-mobile-closing');    rail.classList.add('dc-mobile-open'); }
-        if (sidebar) { sidebar.classList.remove('dc-mobile-closing'); sidebar.classList.add('dc-mobile-open'); }
+        if (sidebar) {
+            sidebar.classList.remove('dc-mobile-closing', 'dc-sidebar-collapsed');
+            sidebar.classList.add('dc-mobile-open');
+        }
         if (overlay) { overlay.classList.remove('dc-mobile-overlay-closing'); overlay.classList.add('dc-mobile-overlay-show'); }
-        // 滚动页面到顶部
-        window.scrollTo({ top: 0, behavior: 'instant' });
+        // 页面置顶
+        window.scrollTo(0, 0);
     }
 
     function _closeMobileSidebar() {

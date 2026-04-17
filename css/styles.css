@@ -11348,13 +11348,16 @@
         }
 
         /* ---- 图标轨道 ---- */
+        /* 宽屏：更淡的遮罩，与顶栏风格一致 */
+        :root { --dc-rail-bg-rgb: 255,255,255; }
+        html[data-theme="dark"] { --dc-rail-bg-rgb: 18,18,18; }
+
         #dc-icon-rail {
             width: var(--dc-rail-width);
             flex-shrink: 0;
-            background: linear-gradient(180deg,
-                rgba(var(--accent-color-rgb), 0.18) 0%,
-                rgba(var(--accent-color-rgb), 0.10) 100%
-            );
+            background: rgba(var(--dc-rail-bg-rgb), 0.38);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border-right: 1px solid var(--border-color);
             display: flex;
             flex-direction: column;
@@ -11362,6 +11365,10 @@
             padding: 0 0 8px;
             gap: 0;
             overflow: hidden;
+            transition: background 0.3s ease;
+        }
+        #dc-icon-rail:hover {
+            background: rgba(var(--dc-rail-bg-rgb), 0.68);
         }
 
         /* 轨道内分割线 */
@@ -11554,10 +11561,14 @@
             flex-shrink: 0;
             display: flex;
             flex-direction: column;
-            background: var(--secondary-bg);
+            background: #ffffff;
             border-right: 1px solid var(--border-color);
             overflow: hidden;
             transition: background-color 0.5s ease, width 0.25s ease;
+        }
+
+        html[data-theme="dark"] #dc-sidebar {
+            background: var(--primary-bg);
         }
 
         /* 侧边栏折叠状态（由会话管理按钮切换） */
@@ -11866,35 +11877,61 @@
 
         /* ---- 响应式：小屏幕（≤768px）隐藏侧栏，显示导航箭头 ---- */
         @media (max-width: 768px) {
+            /* 无论是否 collapsed，窄屏下一律隐藏 */
             #dc-icon-rail,
-            #dc-sidebar {
-                display: none;
+            #dc-sidebar,
+            #dc-sidebar.dc-sidebar-collapsed {
+                display: none !important;
+                width: auto !important;
             }
             .input-area-wrapper {
                 left: 0 !important;
             }
 
-            /* 移动端侧栏滑入状态 */
-            #dc-icon-rail.dc-mobile-open,
+            /* 移动端侧栏滑入状态：rail 和 sidebar 同时出现，背景与顶栏一致（不透明） */
+            #dc-icon-rail.dc-mobile-open {
+                display: flex !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100dvh !important;
+                z-index: 10000 !important;
+                width: var(--dc-rail-width) !important;
+                background: rgba(var(--header-bg-rgb), 0.92) !important;
+                backdrop-filter: blur(16px) !important;
+                -webkit-backdrop-filter: blur(16px) !important;
+                animation: dcSlideInLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+            }
             #dc-sidebar.dc-mobile-open {
                 display: flex !important;
                 position: fixed !important;
                 top: 0 !important;
-                left: 0 !important;
+                left: var(--dc-rail-width) !important;
                 height: 100dvh !important;
                 z-index: 10000 !important;
+                width: var(--dc-sidebar-width) !important;
                 animation: dcSlideInLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
             }
 
             /* 移动端侧栏滑出状态 */
-            #dc-icon-rail.dc-mobile-closing,
-            #dc-sidebar.dc-mobile-closing {
+            #dc-icon-rail.dc-mobile-closing {
                 display: flex !important;
                 position: fixed !important;
                 top: 0 !important;
                 left: 0 !important;
                 height: 100dvh !important;
                 z-index: 10000 !important;
+                width: var(--dc-rail-width) !important;
+                animation: dcSlideOutLeft 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+            }
+            #dc-sidebar.dc-mobile-closing {
+                display: flex !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: var(--dc-rail-width) !important;
+                height: 100dvh !important;
+                z-index: 10000 !important;
+                width: var(--dc-sidebar-width) !important;
                 animation: dcSlideOutLeft 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
             }
 
