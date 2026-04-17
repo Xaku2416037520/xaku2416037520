@@ -11694,14 +11694,14 @@
         /* ---- 头像弹窗 ---- */
         #dc-avatar-popup {
             position: fixed;
-            z-index: 8000;
+            z-index: 10000;
             top: 50%;
-            left: calc(var(--dc-rail-width) + 10px);
-            transform: translateY(-50%) scale(1);
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
             width: 220px;
             background: var(--secondary-bg);
             border-radius: 18px;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.22);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.32);
             border: 1px solid var(--border-color);
             padding: 20px 18px 18px;
             display: flex;
@@ -11723,8 +11723,8 @@
         }
 
         @keyframes dcPopupIn {
-            from { opacity: 0; transform: translateY(-50%) scale(0.88); }
-            to   { opacity: 1; transform: translateY(-50%) scale(1); }
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.88); }
+            to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         }
 
         .dc-avatar-popup-hidden {
@@ -11851,9 +11851,17 @@
             from { transform: translateX(-100%); opacity: 0.6; }
             to   { transform: translateX(0);     opacity: 1; }
         }
+        @keyframes dcSlideOutLeft {
+            from { transform: translateX(0);     opacity: 1; }
+            to   { transform: translateX(-100%); opacity: 0.6; }
+        }
         @keyframes dcFadeIn {
             from { opacity: 0; }
             to   { opacity: 1; }
+        }
+        @keyframes dcFadeOut {
+            from { opacity: 1; }
+            to   { opacity: 0; }
         }
 
         /* ---- 响应式：小屏幕（≤768px）隐藏侧栏，显示导航箭头 ---- */
@@ -11874,8 +11882,20 @@
                 top: 0 !important;
                 left: 0 !important;
                 height: 100dvh !important;
-                z-index: 9000 !important;
+                z-index: 10000 !important;
                 animation: dcSlideInLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+            }
+
+            /* 移动端侧栏滑出状态 */
+            #dc-icon-rail.dc-mobile-closing,
+            #dc-sidebar.dc-mobile-closing {
+                display: flex !important;
+                position: fixed !important;
+                top: 0 !important;
+                left: 0 !important;
+                height: 100dvh !important;
+                z-index: 10000 !important;
+                animation: dcSlideOutLeft 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
             }
 
             /* 遮罩层 */
@@ -11884,11 +11904,15 @@
                 position: fixed;
                 inset: 0;
                 background: rgba(0,0,0,0.45);
-                z-index: 8999;
+                z-index: 9999;
                 animation: dcFadeIn 0.22s ease both;
             }
             #dc-mobile-overlay.dc-mobile-overlay-show {
                 display: block;
+            }
+            #dc-mobile-overlay.dc-mobile-overlay-closing {
+                display: block;
+                animation: dcFadeOut 0.24s ease both;
             }
 
             /* 左箭头按钮 */

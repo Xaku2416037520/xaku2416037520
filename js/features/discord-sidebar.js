@@ -340,18 +340,31 @@
         const rail    = document.getElementById('dc-icon-rail');
         const sidebar = document.getElementById('dc-sidebar');
         const overlay = document.getElementById('dc-mobile-overlay');
-        if (rail)    rail.classList.add('dc-mobile-open');
-        if (sidebar) sidebar.classList.add('dc-mobile-open');
-        if (overlay) overlay.classList.add('dc-mobile-overlay-show');
+        // 清除可能残留的关闭动画 class
+        if (rail)    { rail.classList.remove('dc-mobile-closing');    rail.classList.add('dc-mobile-open'); }
+        if (sidebar) { sidebar.classList.remove('dc-mobile-closing'); sidebar.classList.add('dc-mobile-open'); }
+        if (overlay) { overlay.classList.remove('dc-mobile-overlay-closing'); overlay.classList.add('dc-mobile-overlay-show'); }
+        // 滚动页面到顶部
+        window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
     function _closeMobileSidebar() {
         const rail    = document.getElementById('dc-icon-rail');
         const sidebar = document.getElementById('dc-sidebar');
         const overlay = document.getElementById('dc-mobile-overlay');
-        if (rail)    rail.classList.remove('dc-mobile-open');
-        if (sidebar) sidebar.classList.remove('dc-mobile-open');
-        if (overlay) overlay.classList.remove('dc-mobile-overlay-show');
+        const ANIM_MS = 240;
+
+        // 播放滑出动画
+        if (rail)    { rail.classList.add('dc-mobile-closing'); }
+        if (sidebar) { sidebar.classList.add('dc-mobile-closing'); }
+        if (overlay) { overlay.classList.add('dc-mobile-overlay-closing'); overlay.classList.remove('dc-mobile-overlay-show'); }
+
+        // 动画结束后真正隐藏
+        setTimeout(() => {
+            if (rail)    { rail.classList.remove('dc-mobile-open', 'dc-mobile-closing'); }
+            if (sidebar) { sidebar.classList.remove('dc-mobile-open', 'dc-mobile-closing'); }
+            if (overlay) { overlay.classList.remove('dc-mobile-overlay-closing'); }
+        }, ANIM_MS);
     }
 
     /* ───────────────────────────────────────────────
