@@ -1070,9 +1070,12 @@ function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
     const contentWrapper = document.createElement('div');
     contentWrapper.className = 'message-content-wrapper';
 
-    // ── 构建时间字符串（组末尾 或 alwaysShowAvatar 模式下每条都需要）──
+    // ── 构建时间字符串
+    // inlineTimestamp 模式：名字行在组首（isFirstInGroup），时间戳需跟着名字行 → 组首也要计算
+    // inlineTimestamp=false 模式：时间戳在气泡下方 meta，只在组末（isLastInGroup）显示
+    // 因此只要是组首或组末任一成立就计算；_makeNameRow 内判断 isLastInGroup 决定是否真正插入到名字行
     let timeStr = '';
-    if (settings.timeFormat !== 'off' && (isLastInGroup || settings.alwaysShowAvatar)) {
+    if (settings.timeFormat !== 'off' && (isFirstInGroup || isLastInGroup || settings.alwaysShowAvatar)) {
         const ts = new Date(msg.timestamp);
         const fmt = settings.timeFormat || 'HH:mm';
         if (fmt === 'HH:mm:ss') {

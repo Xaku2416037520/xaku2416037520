@@ -12186,14 +12186,20 @@
             opacity: 0.4;
         }
 
-/* ===== 顶栏视频通话按钮：覆盖 call.js 注入的背景色 ===== */
-.header-actions #call-toolbar-btn {
+/* ===== 顶栏视频通话按钮：完全对齐其他 action-btn 样式 ===== */
+.header-actions #call-toolbar-btn,
+.header-actions #call-toolbar-btn i {
     background-color: transparent !important;
     background: none !important;
+    color: var(--text-secondary) !important;
+    box-shadow: none !important;
+    border: none !important;
 }
-.header-actions #call-toolbar-btn:hover {
+.header-actions #call-toolbar-btn:hover,
+.header-actions #call-toolbar-btn:hover i {
     background-color: var(--message-received-bg) !important;
     color: var(--text-primary) !important;
+    transform: translateY(-1px) scale(1.07);
 }
 body.bottom-collapse-mode .header-actions #call-toolbar-btn {
     display: flex !important;
