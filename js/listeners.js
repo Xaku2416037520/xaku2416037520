@@ -72,7 +72,7 @@ function initChatActionListeners() {
                     }
                     return;
                 }
-                
+
                 const wrapper = e.target.closest('.message-wrapper');
                 if (!wrapper) return; 
                 
@@ -2397,9 +2397,28 @@ playlist.style.top = (rect.top + (player.classList.contains('collapsed') ? 65 : 
 
             DOMElements.messageInput.addEventListener('input', _updateInputExpand);
 
+            // ── 键盘弹出时自动滚动聊天到底部 ──
+            function _scrollChatToBottom() {
+                const c = DOMElements.chatContainer;
+                if (!c) return;
+                const isNearBottom = c.scrollHeight - c.scrollTop - c.clientHeight < 120;
+                if (isNearBottom) c.scrollTop = c.scrollHeight;
+            }
+            if (window.visualViewport) {
+                window.visualViewport.addEventListener('resize', _scrollChatToBottom);
+            }
+            DOMElements.messageInput.addEventListener('focus', () => {
+                setTimeout(_scrollChatToBottom, 100);
+            });
+
             // 发送后重置高度与按钮状态（带动画：先让输入框收缩，再显示按钮）
             function _resetInputAfterSend() {
                 const input = DOMElements.messageInput;
+
+                // setTimeout(0)：等 sendMessage() 所有同步代码执行完后再 blur，
+                // 防止 sendMessage 内部的同步逻辑抢回焦点，造成键盘闪烁
+                setTimeout(() => input.blur(), 0);
+
                 // 立即禁用 overflowY 避免滚动条闪烁
                 input.style.overflowY = 'hidden';
                 // 用过渡动画收回到单行高度
@@ -2407,6 +2426,11 @@ playlist.style.top = (rect.top + (player.classList.contains('collapsed') ? 65 : 
                 const lineHeight = parseFloat(cs.lineHeight) || 22;
                 const paddingV = (parseFloat(cs.paddingTop) || 0) + (parseFloat(cs.paddingBottom) || 0);
                 const singleLineH = Math.round(lineHeight + paddingV);
+                // 先强制确认当前高度为 px 值，让 transition 有起点
+                input.style.transition = 'none';
+                input.style.height = input.offsetHeight + 'px';
+                input.style.transition = '';
+                void input.offsetHeight;
                 input.style.height = singleLineH + 'px';
 
                 // 过渡结束后清理内联样式，同时恢复按钮
@@ -2414,9 +2438,7 @@ playlist.style.top = (rect.top + (player.classList.contains('collapsed') ? 65 : 
                     input.style.height = '';
                     _inputWasTyping = false;
                     _inputExpandTargets.forEach(btn => btn.classList.remove('input-typing-hidden'));
-                    // 发送后重新聚焦，保持键盘显示状态
-                    input.focus();
-                }, 220); // 与 transition duration 对齐
+                }, 220);
             }
             DOMElements.sendBtn.addEventListener('click', _resetInputAfterSend);
             DOMElements.messageInput.addEventListener('keydown', e => {

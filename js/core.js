@@ -1070,12 +1070,9 @@ function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
     const contentWrapper = document.createElement('div');
     contentWrapper.className = 'message-content-wrapper';
 
-    // ── 构建时间字符串
-    // inlineTimestamp 模式：名字行在组首（isFirstInGroup），时间戳需跟着名字行 → 组首也要计算
-    // inlineTimestamp=false 模式：时间戳在气泡下方 meta，只在组末（isLastInGroup）显示
-    // 因此只要是组首或组末任一成立就计算；_makeNameRow 内判断 isLastInGroup 决定是否真正插入到名字行
+    // ── 构建时间字符串（组末尾 或 alwaysShowAvatar 模式下每条都需要）──
     let timeStr = '';
-    if (settings.timeFormat !== 'off' && (isFirstInGroup || isLastInGroup || settings.alwaysShowAvatar)) {
+    if (settings.timeFormat !== 'off' && (isLastInGroup || settings.alwaysShowAvatar)) {
         const ts = new Date(msg.timestamp);
         const fmt = settings.timeFormat || 'HH:mm';
         if (fmt === 'HH:mm:ss') {
@@ -1542,14 +1539,12 @@ const addMessage = (message) => {
                 const cmd = text.replace(/\s+/g, '').toLowerCase();
                 if (cmd === '/测试拍一拍' || cmd === '/testpoke') {
                     DOMElements.messageInput.value = '';
-                    DOMElements.messageInput.style.height = '46px';
                     if (typeof window._triggerPartnerPoke === 'function') window._triggerPartnerPoke();
                     if (typeof showNotification === 'function') showNotification('✦ 强制触发对方拍一拍', 'info', 1800);
                     return;
                 }
                 if (cmd === '/测试状态更新' || cmd === '/teststatus') {
                     DOMElements.messageInput.value = '';
-                    DOMElements.messageInput.style.height = '46px';
                     if (typeof window._triggerStatusChange === 'function') window._triggerStatusChange();
                     if (typeof showNotification === 'function') showNotification('✦ 强制触发状态更新', 'info', 1800);
                     return;
@@ -1557,7 +1552,7 @@ const addMessage = (message) => {
             }
 
             DOMElements.messageInput.value = '';
-            DOMElements.messageInput.style.height = '46px';
+            // 高度重置和 blur 由 listeners.js 的 _resetInputAfterSend 统一处理（带动画）
             if (imageFile && imageFile.size > MAX_IMAGE_SIZE) {
                 showNotification('图片大小不能超过5MB', 'error'); DOMElements.imageInput.value = ''; return;
             }
@@ -1655,7 +1650,7 @@ if (!isBatchMode && type === 'normal') {
             batchMessages.push({
                 id: Date.now() + batchMessages.length, text: text || '', image: imageOverride || null
             });
-            DOMElements.messageInput.value = ''; DOMElements.messageInput.style.height = '46px';
+            DOMElements.messageInput.value = ''; // 高度由 _resetInputAfterSend 统一处理
             updateBatchPreview();
         }
 
