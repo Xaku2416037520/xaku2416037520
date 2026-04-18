@@ -77,8 +77,8 @@
                 return '<option value=”'+p.value+'”'+(sel===p.value?' selected':'')+'>'+p.label+'</option>';
             }).join('');
         }
-        var myLRStyle  = mySel==='custom'?'':'display:none;';
-        var ptrLRStyle = ptrSel==='custom'?'':'display:none;';
+        var myLRStyle  = mySel==='custom'?'display:block;':'display:none;';
+        var ptrLRStyle = ptrSel==='custom'?'display:block;':'display:none;';
         var lrRowStyle = 'display:flex;gap:8px;margin-bottom:12px;';
         var lrInStyle  = 'width:100%;padding:7px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;box-sizing:border-box;font-family:var(--font-family);';
         var lrLabelStyle = 'font-size:11px;color:var(--text-secondary);margin-bottom:4px;font-weight:600;';
@@ -89,7 +89,6 @@
         wrap.innerHTML = [
             '<div style=”background:var(--primary-bg);border-radius:20px;padding:22px 20px;width:min(360px,92vw);box-shadow:0 20px 60px rgba(0,0,0,0.28);border:1px solid var(--border-color);”>',
               '<div style=”display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;”>',
-                '<button id=”psm-back” style=”background:none;border:none;font-size:16px;color:var(--text-secondary);cursor:pointer;padding:2px 8px;border-radius:6px;display:flex;align-items:center;gap:4px;”><i class=”fas fa-arrow-left”></i></button>',
                 '<span style=”font-size:15px;font-weight:700;color:var(--text-primary);font-family:var(--font-family);”>拍一拍装饰符号</span>',
                 '<button id=”psm-close” style=”background:none;border:none;font-size:18px;color:var(--text-secondary);cursor:pointer;padding:2px 6px;border-radius:6px;”>✕</button>',
               '</div>',
@@ -165,21 +164,6 @@
         preview();
 
         function close(){ wrap.remove(); }
-        function goBack(){
-            close();
-            // 返回聊天设置显示面板
-            var chatModal = document.getElementById('chat-modal');
-            var settingsModal = document.getElementById('settings-modal');
-            if(chatModal && typeof showModal==='function'){
-                // 切换到显示tab
-                var displayTab = document.querySelector('#cs-tabs .cs-tab[data-panel="cs-panel-display"]');
-                if(displayTab && typeof switchCsTab==='function') switchCsTab(displayTab);
-                showModal(chatModal);
-            } else if(settingsModal && typeof showModal==='function'){
-                showModal(settingsModal);
-            }
-        }
-        document.getElementById('psm-back').addEventListener('click', goBack);
         document.getElementById('psm-close').addEventListener('click', close);
         document.getElementById('psm-cancel').addEventListener('click', close);
         wrap.addEventListener('click', function(e){ if(e.target===wrap) close(); });
@@ -198,7 +182,7 @@
             }
             close();
             if(window._syncPokeDesc) window._syncPokeDesc();
-            if(typeof showNotification==='function') showNotification('拍一拍符号已保存 ✓','success',1800);
+            if(typeof showNotification==='function') showNotification('戳一戳符号已保存 ✓','success',1800);
         });
     };
 

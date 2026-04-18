@@ -997,8 +997,8 @@ function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
         (prevGroupMemberName && curGroupMemberName && prevGroupMemberName === curGroupMemberName)
     );
 
-    // 有引用的消息不再强制为组首（引用栏已独立为单独模块）
-    const isFirstInGroup = !isSamePersonWithin60s;
+    // 有引用的消息强制为组首（重新开始计时，刷新头像）
+    const isFirstInGroup = !isSamePersonWithin60s || !!msg.replyTo;
 
     // ── showTimestamp 兼容变量（实际由 isFirstInGroup + timeStr 控制）──
     const showTimestamp = isFirstInGroup && settings.timeFormat !== 'off';
@@ -1189,7 +1189,7 @@ function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
             <div class="discord-reply-line-col"></div>
             <div class="discord-reply-content">
                 <div class="discord-reply-avatar ${replyShapeClass}">${replyAvatarHTML}</div>
-                <span class="discord-reply-sender"><span class="discord-reply-at">@</span>${repliedSender}</span>
+                <span class="discord-reply-sender">${repliedSender}</span><span class="discord-reply-sender" style="opacity:0.7;margin-left:1px;">@</span>
                 <span class="discord-reply-text">${repliedText}</span>
             </div>`;
         // ── 关键：将 replyBar 插入到 wrapper 的最前面（avatarDiv 之前），
