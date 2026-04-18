@@ -219,13 +219,49 @@
     /* ───────────────────────────────────────────────
        切换会话
     ─────────────────────────────────────────────── */
-    function _switchSession(sessionId) {
+    async function _switchSession(sessionId) {
         if (sessionId === SESSION_ID) return; // 已是当前，忽略
-        if (confirm('切换会话将刷新页面，确定要继续吗？')) {
-            window.location.hash = sessionId;
-            window.location.reload();
-        }
+
+        // ── 软切换：保存当前会话 → 更新 SESSION_ID → 加载新会话 ──
+        // 关闭任何正在显示的"正在输入"指示器
+        try {
+            var tiW = document.getElementById('typing-indicator-wrapper');
+            if (tiW) {
+                var tiInner = tiW.querySelector('.typing-indicator');
+                if (tiInner) { tiInner.classList.add('hiding'); setTimeout(function(){ tiW.style.display='none'; tiInner.classList.remove('hiding'); }, 240); }
+                else { tiW.style.display = 'none'; }
+            }
+            if (window._typingIndicatorAutoHideTimer) { clearTimeout(window._typingIndicatorAutoHideTimer); window._typingIndicatorAutoHideTimer = null; }
+            if (window._pendingReplyTimer) { clearTimeout(window._pendingReplyTimer); window._pendingReplyTimer = null; }
+        } catch(e) {}
+
+        // 先保存当前会话数据
+        try {
+            if (typeof saveData === 'function') await saveData();
+        } catch(e) { console.warn('[softSwitch] saveData 失败:', e); }
+
+        // 切换 SESSION_ID
+        SESSION_ID = sessionId;
+        history.replaceState(null, '', window.location.pathname + '#' + sessionId);
+        try {
+            await localforage.setItem(APP_PREFIX + 'lastSessionId', sessionId);
+        } catch(e) {}
+
+        // 重置消息列表，防止旧内容闪现
+        if (typeof messages !== 'undefined') messages = [];
+        if (typeof displayedMessageCount !== 'undefined') displayedMessageCount = 20;
+
+        // 加载新会话
+        try {
+            if (typeof loadData === 'function') await loadData();
+        } catch(e) { console.error('[softSwitch] loadData 失败:', e); }
+
+        // 刷新侧栏高亮
+        await dcRenderAll();
+
+        if (typeof showNotification === 'function') showNotification('已切换会话', 'success', 1800);
     }
+
 
     /* ───────────────────────────────────────────────
        头像弹窗
@@ -320,8 +356,7 @@
         }).catch(() => {});
 
         const newCurrentId = sessionList[0].id;
-        window.location.hash = newCurrentId;
-        window.location.reload();
+        _switchSession(newCurrentId);
     }
 
     /* ───────────────────────────────────────────────

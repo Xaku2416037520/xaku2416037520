@@ -370,7 +370,10 @@ const loadData = async () => {
             }));
         } else {
             const backup = _tryRecoverFromBackup();
-            if (backup && Array.isArray(backup.messages) && backup.messages.length > 0) {
+            // 关键：紧急备份是全局键（不区分 session），必须校验 backup.sessionId
+            // 和当前 SESSION_ID 是否一致，否则"新建会话"后会把上一个会话的消息恢复过来。
+            const backupMatchesSession = backup && backup.sessionId && SESSION_ID && backup.sessionId === SESSION_ID;
+            if (backupMatchesSession && Array.isArray(backup.messages) && backup.messages.length > 0) {
                 const timeSince = Math.round((Date.now() - backup.ts) / 60000);
                 console.warn(`[loadData] 主存储无消息，正在从备份恢复（备份时间：${timeSince} 分钟前）`);
                 messages = backup.messages.map(m => ({
@@ -386,6 +389,10 @@ const loadData = async () => {
                     'warning', 6000
                 );
             } else {
+                // 无主存储消息、且备份不属于当前会话：视为空的全新会话
+                if (backup && backup.sessionId && backup.sessionId !== SESSION_ID) {
+                    console.info('[loadData] 备份属于其他会话，跳过恢复，当前会话为空');
+                }
                 messages = [];
             }
         }
@@ -1189,7 +1196,7 @@ function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
             <div class="discord-reply-line-col"></div>
             <div class="discord-reply-content">
                 <div class="discord-reply-avatar ${replyShapeClass}">${replyAvatarHTML}</div>
-                <span class="discord-reply-sender">${repliedSender}</span><span class="discord-reply-sender" style="opacity:0.7;margin-left:1px;">@</span>
+                <span class="discord-reply-sender"><span style="opacity:0.7;">@</span>${repliedSender}</span>
                 <span class="discord-reply-text">${repliedText}</span>
             </div>`;
         // ── 关键：将 replyBar 插入到 wrapper 的最前面（avatarDiv 之前），

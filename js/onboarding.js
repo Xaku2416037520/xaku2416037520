@@ -1,13 +1,16 @@
 (function() {
     var TI_AVATAR_KEY = 'tiSettings_showAvatar';
-    var TI_TEXT_KEY = 'tiSettings_customText';
+    var TI_TEXT_KEY   = 'tiSettings_customText';
+    var TI_ALIGN_KEY  = 'tiSettings_align';
+
     var tiShowAvatar = localStorage.getItem(TI_AVATAR_KEY) !== 'false';
     var tiCustomText = localStorage.getItem(TI_TEXT_KEY) || '';
+    var tiAlign      = localStorage.getItem(TI_ALIGN_KEY) || 'left';
 
+    /* ── 工具函数 ── */
     function applyTiAvatarVisibility() {
         var avatarEl = document.getElementById('typing-indicator-avatar');
-        if (!avatarEl) return;
-        avatarEl.style.display = tiShowAvatar ? '' : 'none';
+        if (avatarEl) avatarEl.style.display = tiShowAvatar ? '' : 'none';
     }
 
     function getTiLabel() {
@@ -17,40 +20,65 @@
     }
 
     function updatePreview() {
-        var previewText = document.getElementById('ti-preview-text');
+        var previewText   = document.getElementById('ti-preview-text');
         var previewAvatar = document.getElementById('ti-preview-avatar');
-        if (previewText) previewText.textContent = getTiLabel();
+        if (previewText)   previewText.textContent = getTiLabel();
         if (previewAvatar) previewAvatar.style.display = tiShowAvatar ? '' : 'none';
-        var label = document.getElementById('typing-indicator-label');
-        if (label && label.textContent) label.textContent = getTiLabel();
+        // 同步实际指示器
+        var label       = document.getElementById('typing-indicator-label');
         var actualAvatar = document.getElementById('typing-indicator-avatar');
+        if (label && label.textContent) label.textContent = getTiLabel();
         if (actualAvatar) actualAvatar.style.display = tiShowAvatar ? '' : 'none';
     }
 
-    function syncPillUI() {
+    function syncAvatarPill() {
         var row = document.getElementById('ti-avatar-toggle');
         if (!row) return;
-        if (tiShowAvatar) {
-            row.classList.add('active');
-        } else {
-            row.classList.remove('active');
+        row.classList.toggle('active', tiShowAvatar);
+    }
+
+    function applyTiAlign() {
+        var w = document.getElementById('typing-indicator-wrapper');
+        if (!w) return;
+        w.classList.toggle('ti-align-right', tiAlign === 'right');
+    }
+
+    function syncAlignBtns() {
+        var btnL = document.getElementById('ti-align-left-btn');
+        var btnR = document.getElementById('ti-align-right-btn');
+        if (!btnL || !btnR) return;
+        btnL.classList.toggle('active', tiAlign === 'left');
+        btnR.classList.toggle('active', tiAlign === 'right');
+    }
+
+    /* ── 内联面板展开/折叠（跟随正在输入 toggle） ── */
+    function syncTiInlinePanel() {
+        var inline = document.getElementById('ti-inline-settings');
+        if (!inline) return;
+        var toggle = document.getElementById('typing-indicator-toggle');
+        var isOn   = toggle && toggle.classList.contains('active');
+        inline.classList.toggle('ti-settings-open', isOn);
+        if (isOn) {
+            // 同步输入框内容与预览
+            var input = document.getElementById('ti-text-input');
+            if (input) input.value = tiCustomText;
+            syncAvatarPill();
+            syncAlignBtns();
+            updatePreview();
+            // 同步对方头像到预览
+            var partnerImg = document.querySelector('#partner-info .message-avatar img') ||
+                             document.querySelector('.partner-avatar img') ||
+                             document.querySelector('[id*="partner"] img');
+            var previewAvatar = document.getElementById('ti-preview-avatar');
+            if (previewAvatar && partnerImg) {
+                previewAvatar.innerHTML = '<img src="' + partnerImg.src + '" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">';
+            }
         }
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        applyTiAvatarVisibility();
-    });
-
-    var _origSetLabel = null;
-    function patchTypingLabel() {
-        var label = document.getElementById('typing-indicator-label');
-        if (label && tiCustomText) {
-            label.textContent = tiCustomText;
-        }
-    }
-    var labelEl = null;
+    /* ── label MutationObserver（防止被外部代码覆写自定义文案） ── */
     function initLabelObserver() {
-        labelEl = document.getElementById('typing-indicator-label');
+        var labelEl = document.getElementById('typing-indicator-label');
         if (!labelEl || labelEl._tiObserved) return;
         labelEl._tiObserved = true;
         var obs = new MutationObserver(function() {
@@ -60,74 +88,84 @@
         });
         obs.observe(labelEl, { childList: true, characterData: true, subtree: true });
     }
-    setTimeout(initLabelObserver, 1000);
 
-    document.addEventListener('click', function(e) {
-        var ti = e.target.closest('.typing-indicator');
-        if (!ti) return;
-        e.stopPropagation();
-        initLabelObserver();
-        var modal = document.getElementById('ti-settings-modal');
-        if (!modal) return;
-        var input = document.getElementById('ti-text-input');
-        if (input) input.value = tiCustomText;
-        syncPillUI();
-        updatePreview();
-        var partnerImg = document.querySelector('#partner-info .message-avatar img') ||
-                         document.querySelector('.partner-avatar img') ||
-                         document.querySelector('[id*="partner"] img');
-        var previewAvatar = document.getElementById('ti-preview-avatar');
-        if (previewAvatar && partnerImg) {
-            previewAvatar.innerHTML = '<img src="' + partnerImg.src + '" style="width:100%;height:100%;object-fit:cover;">';
-        }
-        modal.classList.add('open');
-    });
-
-    document.addEventListener('click', function(e) {
-        var modal = document.getElementById('ti-settings-modal');
-        if (!modal || !modal.classList.contains('open')) return;
-        if (e.target === modal) modal.classList.remove('open');
-    });
-    document.addEventListener('click', function(e) {
-        if (e.target.id === 'ti-settings-close-btn') {
-            var modal = document.getElementById('ti-settings-modal');
-            if (modal) modal.classList.remove('open');
-        }
-    });
-
-    document.addEventListener('click', function(e) {
-        var row = e.target.closest('#ti-avatar-toggle');
-        if (!row) return;
-        tiShowAvatar = !tiShowAvatar;
-        localStorage.setItem(TI_AVATAR_KEY, tiShowAvatar);
-        syncPillUI();
-        updatePreview();
+    /* ── 初始化 ── */
+    document.addEventListener('DOMContentLoaded', function() {
         applyTiAvatarVisibility();
+        syncAvatarPill();
+        syncAlignBtns();
+        applyTiAlign();
+        syncTiInlinePanel();
     });
+    setTimeout(function() {
+        applyTiAvatarVisibility();
+        syncAvatarPill();
+        syncAlignBtns();
+        applyTiAlign();
+        syncTiInlinePanel();
+        initLabelObserver();
+    }, 900);
 
+    /* ── 事件委托 ── */
     document.addEventListener('click', function(e) {
-        if (e.target.id !== 'ti-text-save-btn') return;
-        var input = document.getElementById('ti-text-input');
-        if (!input) return;
-        tiCustomText = input.value.trim();
-        localStorage.setItem(TI_TEXT_KEY, tiCustomText);
-        updatePreview();
-        e.target.textContent = '已保存 ✓';
-        setTimeout(function() { e.target.textContent = '保存'; }, 1200);
-    });
+        // 正在输入 toggle → 展开/折叠内联面板
+        if (e.target.closest('#typing-indicator-toggle')) {
+            setTimeout(syncTiInlinePanel, 80);
+            return;
+        }
 
-    document.addEventListener('click', function(e) {
-        if (e.target.id !== 'ti-text-reset-btn') return;
-        tiCustomText = '';
-        localStorage.removeItem(TI_TEXT_KEY);
-        var input = document.getElementById('ti-text-input');
-        if (input) input.value = '';
-        updatePreview();
-    });
+        // 头像 toggle
+        if (e.target.closest('#ti-avatar-toggle')) {
+            tiShowAvatar = !tiShowAvatar;
+            localStorage.setItem(TI_AVATAR_KEY, tiShowAvatar);
+            syncAvatarPill();
+            updatePreview();
+            applyTiAvatarVisibility();
+            return;
+        }
 
-    document.addEventListener('DOMContentLoaded', function() { syncPillUI(); });
-    setTimeout(syncPillUI, 800);
+        // 左对齐
+        if (e.target.closest('#ti-align-left-btn')) {
+            tiAlign = 'left';
+            localStorage.setItem(TI_ALIGN_KEY, 'left');
+            applyTiAlign();
+            syncAlignBtns();
+            return;
+        }
+
+        // 右对齐
+        if (e.target.closest('#ti-align-right-btn')) {
+            tiAlign = 'right';
+            localStorage.setItem(TI_ALIGN_KEY, 'right');
+            applyTiAlign();
+            syncAlignBtns();
+            return;
+        }
+
+        // 保存自定义文案
+        if (e.target.id === 'ti-text-save-btn') {
+            var input = document.getElementById('ti-text-input');
+            if (!input) return;
+            tiCustomText = input.value.trim();
+            localStorage.setItem(TI_TEXT_KEY, tiCustomText);
+            updatePreview();
+            e.target.textContent = '已保存 ✓';
+            setTimeout(function() { e.target.textContent = '保存'; }, 1200);
+            return;
+        }
+
+        // 恢复默认文案
+        if (e.target.id === 'ti-text-reset-btn') {
+            tiCustomText = '';
+            localStorage.removeItem(TI_TEXT_KEY);
+            var inp = document.getElementById('ti-text-input');
+            if (inp) inp.value = '';
+            updatePreview();
+            return;
+        }
+    });
 })();
+
 
 
 (function() {
@@ -574,6 +612,16 @@ async function createNewSession(switchToIt = true) {
     await localforage.setItem(`${APP_PREFIX}sessionList`, sessionList);
 
     if (switchToIt) {
+        // 关键修复：切换前清掉全局紧急备份（BACKUP_V1_critical 不区分 session），
+        // 否则新会话重载后 loadData 的 fallback 会从该备份恢复上一个会话的消息/设置/纪念日，
+        // 导致新会话显示为旧会话的内容。
+        try { localStorage.removeItem('BACKUP_V1_critical'); } catch(e) {}
+        try { localStorage.removeItem('BACKUP_V1_timestamp'); } catch(e) {}
+        // 同时把 lastSessionId 指向新会话，避免 fallback 路径读到旧 id
+        try { await localforage.setItem(`${APP_PREFIX}lastSessionId`, newId); } catch(e) {}
+        // 防止 reload 过程中 beforeunload/pagehide 再次写入旧会话的备份
+        window._skipBackup = true;
+
         window.location.hash = newId;
         window.location.reload();
     }

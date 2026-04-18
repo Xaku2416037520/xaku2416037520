@@ -287,61 +287,6 @@
         </div>
     </div>
 
-    <div id="ti-settings-modal">
-        <div id="ti-settings-panel">
-            <div class="ti-settings-header">
-                <div class="ti-settings-icon">💬</div>
-                <div>
-                    <div class="ti-settings-title">正在输入</div>
-                </div>
-                <button class="ti-settings-close" id="ti-settings-close-btn">×</button>
-            </div>
-            <div class="ti-settings-body">
-                <div class="ti-settings-row">
-                    <div class="ti-settings-row-label">
-                        <div class="ti-settings-row-icon">❤︎</div>
-                        <div>
-                            <div class="ti-settings-row-text">显示头像</div>
-                            <div class="ti-settings-row-sub">在指示器左侧显示对方头像</div>
-                        </div>
-                    </div>
-                    <div class="setting-pill-row" id="ti-avatar-toggle" style="pointer-events:auto;cursor:pointer;background:var(--primary-bg);border-radius:14px;padding:10px 14px;border:1px solid var(--border-color);">
-                        <div class="setting-pill-switch" id="ti-avatar-pill"><div class="setting-pill-knob"></div></div>
-                    </div>
-                </div>
-
-                <div class="ti-text-edit-row">
-                    <div class="ti-text-edit-label">
-                        <i class="fas fa-pen" style="font-size:11px;color:var(--accent-color);"></i>
-                        <span>自定义文案</span>
-                        <button class="ti-text-reset-btn" id="ti-text-reset-btn">恢复默认</button>
-                    </div>
-                    <div class="ti-text-input-wrap">
-                        <input class="ti-text-input" id="ti-text-input" type="text" maxlength="20" placeholder="例：正在输入…">
-                        <button class="ti-text-save-btn" id="ti-text-save-btn">保存</button>
-                    </div>
-                </div>
-
-                <div>
-                    <div class="ti-text-edit-label" style="margin-bottom:8px;">
-                        <i class="fas fa-eye" style="font-size:11px;color:var(--accent-color);"></i>
-                        <span>预览效果</span>
-                    </div>
-                    <div class="ti-preview-box">
-                        <div id="ti-preview-avatar" style="width:30px;height:30px;border-radius:50%;background:rgba(var(--accent-color-rgb),0.15);border:2px solid rgba(var(--accent-color-rgb),0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
-                            <i class="fas fa-user" style="font-size:12px;color:var(--accent-color);"></i>
-                        </div>
-                        <span id="ti-preview-text" style="font-size:11.5px;font-weight:600;color:var(--accent-color);opacity:0.88;letter-spacing:0.4px;"></span>
-                        <div class="ti-preview-dots">
-                            <div class="ti-preview-dot"></div>
-                            <div class="ti-preview-dot"></div>
-                            <div class="ti-preview-dot"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     <div class="input-area-wrapper">
         <div class="batch-preview" id="batch-preview"></div>
         <div id="reply-preview-container"></div>
@@ -1229,10 +1174,49 @@
                             <span class="setting-pill-label">正在输入</span>
                             <div class="setting-pill-switch"><div class="setting-pill-knob"></div></div>
                         </div>
+                        <!-- 正在输入子设置：启用后向下展开 -->
+                        <div id="ti-inline-settings">
+                            <div class="ti-inline-section">
+                                <div class="ti-inline-section-label"><i class="fas fa-user-circle"></i>显示头像</div>
+                                <div class="setting-pill-row" id="ti-avatar-toggle" style="pointer-events:auto;cursor:pointer;background:transparent;border:none;padding:0;min-width:unset;flex:none;">
+                                    <div class="setting-pill-switch" id="ti-avatar-pill"><div class="setting-pill-knob"></div></div>
+                                </div>
+                            </div>
+                            <div class="ti-inline-section">
+                                <div class="ti-inline-section-label"><i class="fas fa-arrows-alt-h"></i>显示方向</div>
+                                <div class="ti-align-group">
+                                    <button class="ti-align-btn active" id="ti-align-left-btn"><i class="fas fa-align-left"></i> 左侧</button>
+                                    <button class="ti-align-btn" id="ti-align-right-btn"><i class="fas fa-align-right"></i> 右侧</button>
+                                </div>
+                            </div>
+                            <div class="ti-inline-text-row">
+                                <div class="ti-inline-text-header">
+                                    <i class="fas fa-pen"></i>自定义文案
+                                    <button id="ti-text-reset-btn">恢复默认</button>
+                                </div>
+                                <div class="ti-inline-input-wrap">
+                                    <input id="ti-text-input" type="text" maxlength="20" placeholder="例：正在输入…">
+                                    <button class="ti-inline-save-btn" id="ti-text-save-btn">保存</button>
+                                </div>
+                            </div>
+                            <div class="ti-inline-preview">
+                                <div id="ti-preview-avatar" style="width:28px;height:28px;border-radius:50%;background:rgba(var(--accent-color-rgb),0.15);border:2px solid rgba(var(--accent-color-rgb),0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;">
+                                    <i class="fas fa-user" style="font-size:11px;color:var(--accent-color);"></i>
+                                </div>
+                                <span id="ti-preview-text" style="font-size:11.5px;font-weight:600;color:var(--accent-color);opacity:0.88;letter-spacing:0.4px;"></span>
+                                <div class="ti-preview-dots"><div class="ti-preview-dot"></div><div class="ti-preview-dot"></div><div class="ti-preview-dot"></div></div>
+                                <span class="ti-inline-preview-label">预览效果</span>
+                            </div>
+                        </div>
                     </div>
 
                     <p class="cs-group-label" style="margin-top:4px;">时间戳</p>
                     <div class="cs-card">
+                        <div class="setting-pill-row" id="inline-timestamp-toggle" style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border-color);">
+                            <span class="setting-pill-icon"><i class="fas fa-align-right"></i></span>
+                            <span class="setting-pill-label">时间戳/已读显示在名字旁</span>
+                            <div class="setting-pill-switch"><div class="setting-pill-knob"></div></div>
+                        </div>
                         <div class="cs-time-grid" id="time-format-options">
                             <div class="settings-item time-fmt-opt active" data-fmt="HH:mm">
                                 <i class="fas fa-clock"></i><span>14:05</span>
@@ -1251,13 +1235,6 @@
                             </div>
                             <div class="settings-item time-fmt-opt" data-fmt="off">
                                 <i class="fas fa-eye-slash"></i><span>关闭时间戳</span>
-                            </div>
-                        </div>
-                        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border-color);">
-                            <div class="setting-pill-row" id="inline-timestamp-toggle">
-                                <span class="setting-pill-icon"><i class="fas fa-align-right"></i></span>
-                                <span class="setting-pill-label">时间戳/已读显示在名字旁</span>
-                                <div class="setting-pill-switch"><div class="setting-pill-knob"></div></div>
                             </div>
                         </div>
                     </div>

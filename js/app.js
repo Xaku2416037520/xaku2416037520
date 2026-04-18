@@ -103,7 +103,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else if (document.visibilityState === 'visible') {
                 try {
                     const backup = typeof _tryRecoverFromBackup === 'function' ? _tryRecoverFromBackup() : null;
-                    if (backup && Array.isArray(backup.messages) && backup.messages.length > 0 && Array.isArray(messages) && backup.messages.length > messages.length) {
+                    // 必须校验 sessionId 匹配，否则会把其他会话的消息恢复到当前会话
+                    const sameSession = backup && backup.sessionId && typeof SESSION_ID !== 'undefined' && backup.sessionId === SESSION_ID;
+                    if (sameSession && Array.isArray(backup.messages) && backup.messages.length > 0 && Array.isArray(messages) && backup.messages.length > messages.length) {
                         console.warn('[visibilitychange] 检测到备份消息比当前更多，自动尝试恢复');
                         try {
                             messages = backup.messages.map(m => ({
@@ -165,7 +167,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error('严重初始化错误:', err);
         try {
             const backup = typeof _tryRecoverFromBackup === 'function' ? _tryRecoverFromBackup() : null;
-            if (backup && Array.isArray(backup.messages) && backup.messages.length > 0) {
+            // 初始化失败时 SESSION_ID 可能还未就绪，这时候允许直接恢复；
+            // 一旦 SESSION_ID 已就绪则必须校验匹配，防止跨会话错误恢复
+            const canRestore = backup && Array.isArray(backup.messages) && backup.messages.length > 0
+                && (typeof SESSION_ID === 'undefined' || !SESSION_ID || !backup.sessionId || backup.sessionId === SESSION_ID);
+            if (canRestore) {
                 messages = backup.messages.map(m => ({
                     ...m,
                     timestamp: new Date(m.timestamp)

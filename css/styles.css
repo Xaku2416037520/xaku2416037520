@@ -2620,12 +2620,28 @@
         #typing-indicator-wrapper {
             display: none;
             position: fixed;
-            bottom: 0;          
+            bottom: 0;
             left: 16px;
-            z-index: 49;        
+            right: auto;
+            z-index: 49;
             pointer-events: auto;
             padding-bottom: 8px;
-            background: transparent !important; 
+            background: transparent !important;
+            transition: left 0.3s ease, right 0.3s ease;
+        }
+        /* 跟随侧栏偏移，与 input-area-wrapper 保持对齐 */
+        @media (min-width: 769px) {
+            #typing-indicator-wrapper {
+                left: calc(var(--dc-total-left, 276px) + 16px);
+            }
+            #typing-indicator-wrapper.ti-align-right {
+                left: auto !important;
+                right: 16px;
+            }
+        }
+        #typing-indicator-wrapper.ti-align-right {
+            left: auto;
+            right: 16px;
         }
         .typing-indicator {
             display: inline-flex;
@@ -2724,6 +2740,147 @@
         }
         .typing-indicator.hiding {
             animation: typingIndicatorOut 0.25s ease forwards;
+        }
+
+        /* ── 正在输入 内联设置面板（嵌入聊天设置） ── */
+        #ti-inline-settings {
+            overflow: hidden;
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.38s cubic-bezier(0.4,0,0.2,1),
+                        opacity 0.28s ease,
+                        padding 0.28s ease;
+            padding: 0 4px;
+        }
+        #ti-inline-settings.ti-settings-open {
+            max-height: 380px;
+            opacity: 1;
+            padding: 6px 4px 4px;
+        }
+        .ti-inline-section {
+            background: var(--primary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .ti-inline-section-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .ti-inline-section-label i {
+            font-size: 11px;
+            color: var(--accent-color);
+        }
+        /* 对齐方式按钮组 */
+        .ti-align-group {
+            display: flex;
+            gap: 6px;
+        }
+        .ti-align-btn {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 11px;
+            border-radius: 10px;
+            border: 1.5px solid var(--border-color);
+            background: transparent;
+            font-size: 11.5px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+        .ti-align-btn.active {
+            border-color: var(--accent-color);
+            background: rgba(var(--accent-color-rgb), 0.10);
+            color: var(--accent-color);
+        }
+        .ti-align-btn i { font-size: 11px; }
+        /* 自定义文案行 */
+        .ti-inline-text-row {
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: var(--primary-bg);
+            margin-bottom: 8px;
+        }
+        .ti-inline-text-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+        .ti-inline-text-header i { font-size: 11px; color: var(--accent-color); }
+        .ti-inline-text-header button {
+            margin-left: auto;
+            font-size: 11px;
+            background: none;
+            border: none;
+            color: var(--accent-color);
+            cursor: pointer;
+            opacity: 0.75;
+            text-decoration: underline;
+            padding: 0;
+        }
+        .ti-inline-input-wrap {
+            display: flex;
+            gap: 8px;
+        }
+        .ti-inline-input-wrap input {
+            flex: 1;
+            padding: 7px 10px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--secondary-bg);
+            color: var(--text-primary);
+            font-size: 12px;
+            outline: none;
+        }
+        .ti-inline-input-wrap input:focus {
+            border-color: var(--accent-color);
+        }
+        .ti-inline-save-btn {
+            padding: 7px 14px;
+            border-radius: 10px;
+            border: none;
+            background: var(--accent-color);
+            color: #fff;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.18s;
+        }
+        .ti-inline-save-btn:hover { opacity: 0.85; }
+        /* 预览框 */
+        .ti-inline-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: rgba(var(--accent-color-rgb), 0.05);
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 2px;
+        }
+        .ti-inline-preview-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            opacity: 0.7;
+            margin-right: auto;
         }
 
         .typing-dots {
@@ -9011,6 +9168,8 @@
             padding: 0;
             margin: 0;
             margin-top: -2px;
+            /* 拉开引用栏与下方消息气泡的间距 */
+            margin-bottom: 6px;
             cursor: pointer;
             overflow: visible;
         }
@@ -9037,7 +9196,8 @@
             position: absolute;
             left: calc(var(--in-chat-avatar-size, 36px) / 2 - 1px);
             top: 50%;
-            bottom: 0;
+            /* 负值：向下延伸以跨过引用栏底部 6px 的 margin，确保折线连到下方头像 */
+            bottom: -6px;
             width: calc(var(--in-chat-avatar-size, 36px) / 2 + 10px - 2px);
             border-left: 2px solid var(--accent-color);
             border-top: 2px solid var(--accent-color);

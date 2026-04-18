@@ -58,7 +58,7 @@
     window._sanitizePokeTextForDisplay = _stripEmojiForPoke;
 
     function _esc(s) {
-        return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/”/g,'&quot;');
+        return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
     window._openPokeSymSettings = function() {
@@ -74,7 +74,7 @@
 
         function opts(sel) {
             return PRESETS.map(function(p){
-                return '<option value=”'+p.value+'”'+(sel===p.value?' selected':'')+'>'+p.label+'</option>';
+                return '<option value="'+p.value+'"'+(sel===p.value?' selected':'')+'>'+p.label+'</option>';
             }).join('');
         }
         var myLRStyle  = mySel==='custom'?'display:block;':'display:none;';
@@ -87,43 +87,43 @@
         wrap.id = 'poke-sym-modal';
         wrap.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);';
         wrap.innerHTML = [
-            '<div style=”background:var(--primary-bg);border-radius:20px;padding:22px 20px;width:min(360px,92vw);box-shadow:0 20px 60px rgba(0,0,0,0.28);border:1px solid var(--border-color);”>',
-              '<div style=”display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;”>',
-                '<span style=”font-size:15px;font-weight:700;color:var(--text-primary);font-family:var(--font-family);”>拍一拍装饰符号</span>',
-                '<button id=”psm-close” style=”background:none;border:none;font-size:18px;color:var(--text-secondary);cursor:pointer;padding:2px 6px;border-radius:6px;”>✕</button>',
+            '<div style="background:var(--primary-bg);border-radius:20px;padding:22px 20px;width:min(360px,92vw);box-shadow:0 20px 60px rgba(0,0,0,0.28);border:1px solid var(--border-color);">',
+              '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;">',
+                '<span style="font-size:15px;font-weight:700;color:var(--text-primary);font-family:var(--font-family);">拍一拍装饰符号</span>',
+                '<button id="psm-close" style="background:none;border:none;font-size:18px;color:var(--text-secondary);cursor:pointer;padding:2px 6px;border-radius:6px;">✕</button>',
               '</div>',
-              '<div style=”font-size:11px;color:var(--text-secondary);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;”>我发出的</div>',
-              '<select id=”psm-my” style=”width:100%;padding:9px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;font-family:var(--font-family);margin-bottom:8px;”>'+opts(mySel)+'</select>',
-              '<div id=”psm-my-cw” style=”'+myLRStyle+'”>',
-                '<div style=”'+lrRowStyle+'”>',
-                  '<div style=”flex:1;”>',
-                    '<div style=”'+lrLabelStyle+'”>左边符号</div>',
-                    '<input id=”psm-my-l” type=”text” maxlength=”4” placeholder=”左符号” value=”'+_esc(myL)+'” style=”'+lrInStyle+'”>',
+              '<div style="font-size:11px;color:var(--text-secondary);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;">我发出的</div>',
+              '<select id="psm-my" style="width:100%;padding:9px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;font-family:var(--font-family);margin-bottom:8px;">'+opts(mySel)+'</select>',
+              '<div id="psm-my-cw" style="'+myLRStyle+'">',
+                '<div style="'+lrRowStyle+'">',
+                  '<div style="flex:1;">',
+                    '<div style="'+lrLabelStyle+'">左边符号</div>',
+                    '<input id="psm-my-l" type="text" maxlength="4" placeholder="左符号" value="'+_esc(myL)+'" style="'+lrInStyle+'">',
                   '</div>',
-                  '<div style=”flex:1;”>',
-                    '<div style=”'+lrLabelStyle+'”>右边符号</div>',
-                    '<input id=”psm-my-r” type=”text” maxlength=”4” placeholder=”右符号” value=”'+_esc(myR)+'” style=”'+lrInStyle+'”>',
+                  '<div style="flex:1;">',
+                    '<div style="'+lrLabelStyle+'">右边符号</div>',
+                    '<input id="psm-my-r" type="text" maxlength="4" placeholder="右符号" value="'+_esc(myR)+'" style="'+lrInStyle+'">',
                   '</div>',
                 '</div>',
               '</div>',
-              '<div style=”font-size:11px;color:var(--text-secondary);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;”>对方发出的</div>',
-              '<select id=”psm-ptr” style=”width:100%;padding:9px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;font-family:var(--font-family);margin-bottom:8px;”>'+opts(ptrSel)+'</select>',
-              '<div id=”psm-ptr-cw” style=”'+ptrLRStyle+'”>',
-                '<div style=”'+lrRowStyle+'”>',
-                  '<div style=”flex:1;”>',
-                    '<div style=”'+lrLabelStyle+'”>左边符号</div>',
-                    '<input id=”psm-ptr-l” type=”text” maxlength=”4” placeholder=”左符号” value=”'+_esc(ptrL)+'” style=”'+lrInStyle+'”>',
+              '<div style="font-size:11px;color:var(--text-secondary);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;">对方发出的</div>',
+              '<select id="psm-ptr" style="width:100%;padding:9px 10px;border:1.5px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-primary);font-size:13px;outline:none;font-family:var(--font-family);margin-bottom:8px;">'+opts(ptrSel)+'</select>',
+              '<div id="psm-ptr-cw" style="'+ptrLRStyle+'">',
+                '<div style="'+lrRowStyle+'">',
+                  '<div style="flex:1;">',
+                    '<div style="'+lrLabelStyle+'">左边符号</div>',
+                    '<input id="psm-ptr-l" type="text" maxlength="4" placeholder="左符号" value="'+_esc(ptrL)+'" style="'+lrInStyle+'">',
                   '</div>',
-                  '<div style=”flex:1;”>',
-                    '<div style=”'+lrLabelStyle+'”>右边符号</div>',
-                    '<input id=”psm-ptr-r” type=”text” maxlength=”4” placeholder=”右符号” value=”'+_esc(ptrR)+'” style=”'+lrInStyle+'”>',
+                  '<div style="flex:1;">',
+                    '<div style="'+lrLabelStyle+'">右边符号</div>',
+                    '<input id="psm-ptr-r" type="text" maxlength="4" placeholder="右符号" value="'+_esc(ptrR)+'" style="'+lrInStyle+'">',
                   '</div>',
                 '</div>',
               '</div>',
-              '<div id=”psm-preview” style=”background:var(--secondary-bg);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--text-secondary);margin-bottom:16px;border:1px dashed var(--border-color);line-height:1.7;”></div>',
-              '<div style=”display:flex;gap:8px;”>',
-                '<button id=”psm-cancel” style=”flex:1;padding:9px;border:1px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-secondary);font-size:13px;cursor:pointer;font-family:var(--font-family);”>取消</button>',
-                '<button id=”psm-save” style=”flex:2;padding:9px;border:none;border-radius:10px;background:var(--accent-color);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-family);”>保存</button>',
+              '<div id="psm-preview" style="background:var(--secondary-bg);border-radius:10px;padding:10px 14px;font-size:12.5px;color:var(--text-secondary);margin-bottom:16px;border:1px dashed var(--border-color);line-height:1.7;"></div>',
+              '<div style="display:flex;gap:8px;">',
+                '<button id="psm-cancel" style="flex:1;padding:9px;border:1px solid var(--border-color);border-radius:10px;background:var(--secondary-bg);color:var(--text-secondary);font-size:13px;cursor:pointer;font-family:var(--font-family);">取消</button>',
+                '<button id="psm-save" style="flex:2;padding:9px;border:none;border-radius:10px;background:var(--accent-color);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font-family);">保存</button>',
               '</div>',
             '</div>'
         ].join('');
@@ -148,8 +148,8 @@
             var mt  = (ms.left||ms.right) ? ((ms.left?ms.left+' ':'')+myN+' 拍了拍你'+(ms.right?' '+ms.right:'')) : (myN+' 拍了拍你');
             var pt  = (ps.left||ps.right) ? ((ps.left?ps.left+' ':'')+pN+' 拍了拍你'+(ps.right?' '+ps.right:'')) : (pN+' 拍了拍你');
             document.getElementById('psm-preview').innerHTML =
-                '<div style=”color:var(--text-primary);”>我：'+_esc(mt)+'</div>'+
-                '<div style=”color:var(--text-primary);margin-top:3px;”>对方：'+_esc(pt)+'</div>';
+                '<div style="color:var(--text-primary);">我：'+_esc(mt)+'</div>'+
+                '<div style="color:var(--text-primary);margin-top:3px;">对方：'+_esc(pt)+'</div>';
         }
 
         document.getElementById('psm-my').addEventListener('change', function(){
