@@ -2343,8 +2343,56 @@ playlist.style.top = (rect.top + (player.classList.contains('collapsed') ? 65 : 
                     e.preventDefault(); isBatchMode ? addToBatch(): sendMessage();
                 }
             });
-            DOMElements.messageInput.addEventListener('input', () => {
-                DOMElements.messageInput.style.height = 'auto'; DOMElements.messageInput.style.height = `${Math.min(DOMElements.messageInput.scrollHeight, 120)}px`;
+
+            // ── 输入框动态扩展 + 左侧工具栏自动隐藏 ──
+            const _inputExpandTargets = [
+                document.getElementById('advanced-functions-btn'),
+                document.getElementById('attachment-btn'),
+                document.getElementById('combo-btn')
+            ].filter(Boolean);
+
+            let _inputWasTyping = false;
+
+            function _updateInputExpand() {
+                const input = DOMElements.messageInput;
+                const lineHeight = parseFloat(getComputedStyle(input).lineHeight) || 22;
+                const paddingV = parseFloat(getComputedStyle(input).paddingTop) + parseFloat(getComputedStyle(input).paddingBottom) || 12;
+                const maxHeight = Math.round(lineHeight * 8 + paddingV);
+
+                input.style.height = 'auto';
+                const newHeight = Math.min(input.scrollHeight, maxHeight);
+                input.style.height = newHeight + 'px';
+                input.style.overflowY = input.scrollHeight > maxHeight ? 'auto' : 'hidden';
+
+                const hasText = input.value.length > 0;
+
+                if (hasText !== _inputWasTyping) {
+                    _inputWasTyping = hasText;
+                    _inputExpandTargets.forEach(btn => {
+                        if (hasText) {
+                            btn.classList.add('input-typing-hidden');
+                        } else {
+                            btn.classList.remove('input-typing-hidden');
+                        }
+                    });
+                }
+            }
+
+            DOMElements.messageInput.addEventListener('input', _updateInputExpand);
+
+            // 发送后重置高度与按钮状态
+            const _origSendBtnClick = DOMElements.sendBtn.onclick;
+            function _resetInputAfterSend() {
+                setTimeout(() => {
+                    DOMElements.messageInput.style.height = '';
+                    DOMElements.messageInput.style.overflowY = 'hidden';
+                    _inputWasTyping = false;
+                    _inputExpandTargets.forEach(btn => btn.classList.remove('input-typing-hidden'));
+                }, 30);
+            }
+            DOMElements.sendBtn.addEventListener('click', _resetInputAfterSend);
+            DOMElements.messageInput.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) _resetInputAfterSend();
             });
 
 

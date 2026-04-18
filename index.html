@@ -22,6 +22,48 @@
 
     <link rel="stylesheet" href="css/styles.css">
 
+    <style id="input-expand-style">
+        /* ── 输入框高度过渡 ── */
+        #message-input {
+            transition: height 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+            resize: none;
+            overflow-y: hidden;
+            box-sizing: border-box;
+        }
+
+        /* ── 输入时隐藏左侧三个工具按钮 ── */
+        .input-typing-hidden {
+            opacity: 0 !important;
+            transform: scale(0.6) !important;
+            max-width: 0 !important;
+            min-width: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow: hidden !important;
+            pointer-events: none !important;
+            transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                        max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        margin 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        }
+
+        /* 非隐藏状态也加过渡，保证恢复时有动效 */
+        #advanced-functions-btn,
+        #attachment-btn,
+        #combo-btn {
+            transition: opacity 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                        transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                        max-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        min-width 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        margin 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        padding 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                        background 0.2s, color 0.2s, box-shadow 0.2s;
+            transform-origin: left center;
+            overflow: hidden;
+        }
+    </style>
     <style id="css-live-preview-style"></style>
 </head>
 <body>

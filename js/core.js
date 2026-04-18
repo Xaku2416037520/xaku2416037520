@@ -1007,8 +1007,21 @@ function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
     // 有引用的消息强制为组首（重新开始计时，刷新头像）
     const isFirstInGroup = !isSamePersonWithin60s || !!msg.replyTo;
 
-    // ── showTimestamp 兼容变量（实际由 isFirstInGroup + timeStr 控制）──
-    const showTimestamp = isFirstInGroup && settings.timeFormat !== 'off';
+    // ── isLastInGroup：判断本条是否为发送组的最后一条消息 ──
+    const nextTs = nextMsg ? new Date(nextMsg.timestamp).getTime() : 0;
+    const nextGroupMemberName = (nextMsg && nextMsg.sender !== 'user' && typeof getGroupMemberForMessage === 'function')
+        ? (getGroupMemberForMessage(nextMsg.id)?.name ?? null) : null;
+    const isSameSenderAsNext = !!(nextMsg && nextMsg.sender === msg.sender && nextMsg.type !== 'system');
+    const isWithin60sToNext = isSameSenderAsNext && (nextTs - curTs < 60000);
+    const isSamePersonWithin60sNext = isWithin60sToNext && (
+        (!groupMember && !nextGroupMemberName) ||
+        (nextGroupMemberName && curGroupMemberName && nextGroupMemberName === curGroupMemberName)
+    );
+    // 下一条有引用则本条也是组末尾（下一条强制开新组）
+    const isLastInGroup = !isSamePersonWithin60sNext || !!(nextMsg && nextMsg.replyTo);
+
+    // ── showTimestamp 兼容变量（时间戳显示在组末尾）──
+    const showTimestamp = isLastInGroup && settings.timeFormat !== 'off';
 
     const wrapper = document.createElement('div');
     // discord-msg-first：每组第一条（或 alwaysShowAvatar 模式下每条）
@@ -1057,9 +1070,9 @@ function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
     const contentWrapper = document.createElement('div');
     contentWrapper.className = 'message-content-wrapper';
 
-    // ── 构建时间字符串（组首或 alwaysShowAvatar 模式下每条都需要）──
+    // ── 构建时间字符串（组末尾 或 alwaysShowAvatar 模式下每条都需要）──
     let timeStr = '';
-    if (settings.timeFormat !== 'off' && (isFirstInGroup || settings.alwaysShowAvatar)) {
+    if (settings.timeFormat !== 'off' && (isLastInGroup || settings.alwaysShowAvatar)) {
         const ts = new Date(msg.timestamp);
         const fmt = settings.timeFormat || 'HH:mm';
         if (fmt === 'HH:mm:ss') {
@@ -1233,8 +1246,8 @@ function createMessageFragment(msg, prevMsg, nextMsg, lastSenderRef) {
 
     // ── 气泡下方 meta（inlineTimestamp=false 时显示时间戳和已读）──
     if (settings.inlineTimestamp === false) {
-        const showTsInMeta = timeStr && (isFirstInGroup || settings.alwaysShowAvatar);
-        const hasMeta = showTsInMeta || (msg.sender === 'user' && settings.readReceiptsEnabled && (isFirstInGroup || settings.alwaysShowAvatar));
+        const showTsInMeta = timeStr && (isLastInGroup || settings.alwaysShowAvatar);
+        const hasMeta = showTsInMeta || (msg.sender === 'user' && settings.readReceiptsEnabled && (isLastInGroup || settings.alwaysShowAvatar));
         if (hasMeta) {
             const metaDiv = document.createElement('div');
             metaDiv.className = 'message-meta';
